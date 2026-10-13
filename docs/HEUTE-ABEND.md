@@ -27,7 +27,7 @@ Windows warnt beim ersten Start evtl. mit „Der Computer wurde durch Windows ge
 | 4 | **Setup-Skript** in PowerShell ausführen: `irm https://raw.githubusercontent.com/carl147258-cmd/Claude/claude/obby-und-leitfaden/scripts/setup-pc.ps1 \| iex`. Es lädt das Projekt, verbindet Studio und legt die Desktop-Verknüpfung an. | 2 min |
 | 5 | **Fotos auf den PC** in den Ordner `C:\Users\<Name>\Roblox-Claude\refs\auto` legen, per **Smartphone-Link** (bei Windows 11 dabei), OneDrive, USB-Kabel oder Mail an dich selbst. | 2 min |
 | 6 | **Studio neu starten** und das Spiel wieder öffnen. In „Manage MCP Servers“ sollte bald ein grüner Punkt erscheinen. | 1 min |
-| 7 | Auf dem Desktop **„Roblox-Claude Remote“** doppelklicken. Ein Fenster öffnet sich: Claude läuft im Remote-Modus, der PC bleibt wach. **Fenster offen lassen.** | 1 min |
+| 7 | Auf dem Desktop **„Roblox-Claude Remote“** doppelklicken. Ein Fenster öffnet sich: Beim ersten Start fragt es „Trust …Roblox-Claude? [y/N]“: `y` + Enter. Claude läuft im Remote-Modus, der PC bleibt wach. **Fenster offen lassen.** | 1 min |
 | 8 | **Test vom Handy:** Claude-App → **Code** → die neue Sitzung antippen → schreiben: *„Prüfe die Verbindung zu Roblox Studio (list_roblox_studios) und mach einen Screenshot.“* Kommt ein Screenshot, ist alles bereit. | 2 min |
 
 **Bevor du gehst:** PC **nicht** herunterfahren, Studio und das Remote-Fenster offen lassen. Bildschirm sperren (Windows-Taste + L) ist in Ordnung.
