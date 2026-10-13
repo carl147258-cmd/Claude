@@ -58,7 +58,13 @@ if (-not $claude) {
     Write-Host "   Nutzt du die Claude-Desktop-App? Dann in Studio bei 'Quick connect' Claude Desktop einschalten."
 } elseif (-not (Test-Path $mcp)) {
     Write-Host "   Roblox-Studio-Schnittstelle nicht gefunden ($mcp)." -ForegroundColor Yellow
-    Write-Host "   Studio aktualisieren, Assistant -> ... -> Manage MCP Servers -> 'Enable Studio as MCP server' einschalten,"
+    # the Roblox Player (games app) is not Studio; Studio ships RobloxStudioBeta.exe
+    $studio = Get-ChildItem (Join-Path $env:LOCALAPPDATA "Roblox\Versions") -Recurse -Filter "RobloxStudioBeta.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $studio) {
+        Write-Host "   Roblox Studio ist nicht installiert (die normale Roblox-App reicht nicht)." -ForegroundColor Yellow
+        Write-Host "   Download: https://create.roblox.com -> 'Start Creating' / 'Studio herunterladen'."
+    }
+    Write-Host "   In Studio: Assistant -> ... -> Manage MCP Servers -> 'Enable Studio as MCP server' einschalten,"
     Write-Host "   dann dieses Skript erneut ausfuehren."
 } else {
     Push-Location $Target
