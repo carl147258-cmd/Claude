@@ -22,7 +22,7 @@ Windows warnt beim ersten Start evtl. mit „Der Computer wurde durch Windows ge
 | # | Schritt | Dauer |
 |---|---|---|
 | 1 | **Roblox Studio** starten. Updates installieren lassen. Ein Spiel öffnen (für den Test: **New → Baseplate**). | 2 min |
-| 2 | In Studio: **Assistant** → **…** → **Manage MCP Servers** → **Enable Studio as MCP server** einschalten. | 1 min |
+| 2 | In Studio: **Assistant** (Symbol oben rechts) → **…** → **Manage MCP Servers** → **Enable Studio as MCP server** einschalten. Deutsches Studio: Assistenteneinstellungen → **MCP-Server** → **„Studio als MCP-Server aktivieren“**. | 1 min |
 | 3 | **Claude Code installieren**, falls noch nicht vorhanden: Startmenü → „PowerShell“ öffnen → `irm https://claude.ai/install.ps1 \| iex` → danach PowerShell schließen und neu öffnen → `claude` eingeben → im Browser anmelden → mit `/exit` beenden. | 3 min |
 | 4 | **Setup-Skript** in PowerShell ausführen: `irm https://raw.githubusercontent.com/carl147258-cmd/Claude/claude/obby-und-leitfaden/scripts/setup-pc.ps1 \| iex`. Es lädt das Projekt, verbindet Studio und legt die Desktop-Verknüpfung an. | 2 min |
 | 5 | **Fotos auf den PC** in den Ordner `Desktop\Roblox\refs\auto` (bei OneDrive: `C:\Users\<Name>\OneDrive\Desktop\Roblox\refs\auto`) legen, per **Smartphone-Link** (bei Windows 11 dabei), OneDrive, USB-Kabel oder Mail an dich selbst. | 2 min |
