@@ -24,7 +24,15 @@ local DEFAULT_DATA: Data = {
 -- In Studio, fail fast so unpublished places stay playable without saving.
 local MAX_RETRIES = if RunService:IsStudio() then 1 else 5
 
-local store = DataStoreService:GetDataStore(Config.DataStoreName)
+-- GetDataStore itself throws in unpublished places, so it must not run unprotected.
+local storeOk, storeResult = pcall(function()
+	return DataStoreService:GetDataStore(Config.DataStoreName)
+end)
+local store: DataStore? = if storeOk then storeResult else nil
+if not storeOk then
+	warn(`DataStore unavailable: {storeResult}`)
+end
+
 local cache: { [Player]: Data } = {}
 local canSave: { [Player]: boolean } = {}
 
@@ -69,7 +77,7 @@ end
 
 local function onPlayerAdded(player: Player)
 	local ok, stored = withRetries(function()
-		return store:GetAsync(key(player))
+		return assert(store, "DataStore unavailable"):GetAsync(key(player))
 	end)
 
 	if not ok then
@@ -126,7 +134,7 @@ function PlayerData.Save(player: Player): boolean
 		return false
 	end
 	local ok = withRetries(function()
-		return store:UpdateAsync(key(player), function()
+		return assert(store, "DataStore unavailable"):UpdateAsync(key(player), function()
 			return data
 		end)
 	end)

@@ -32,6 +32,10 @@ Entry format:
 - **The user's Studio is German; give German labels too.** Assistant = icon top right (no text label); settings window "Assistenteneinstellungen" → **MCP-Server** → toggle **„Studio als MCP-Server aktivieren“** (status „Keine Clients verbunden“ until Claude reconnects; then `/mcp` → Roblox_Studio → Reconnect). `mcp.bat` exists even while the toggle is off, so it does not prove MCP is enabled. No API key is needed for Claude Code. (2026-10-13)
 - **Symptom of the toggle being off: Studio MCP is "connected" with zero tools.** `StudioMCP.exe` runs and the `Roblox_Studio` server sends instructions, but `list_roblox_studios`/`screen_capture` are missing (ToolSearch finds nothing). Fix as in the entry above (toggle on + Reconnect); confirmed working afterwards. (2026-10-13)
 - **The user's PC has no global git identity, and pushing needs an interactive GitHub login.** Commit with `git -c user.name=Claude -c user.email=noreply@anthropic.com commit` (matches the repo history, no config change); for the push, ask the user to run `! git push` so Git Credential Manager can open its sign-in window. (2026-10-13)
+- **`scripts/check-luau.sh` must run on Windows too (Git Bash):** it originally fetched only Linux binaries ("Exec format error"), and Git's `autocrlf` checked `.luau` files out as CRLF, so StyLua flagged every file. Fixed with per-platform binaries in `.tools/<os>/` and `.gitattributes` (`*.luau eol=lf`). (2026-10-13)
+- **`set -e` does not apply inside `( … ) || status=1`.** StyLua/Selene failures in the check script were silently ignored (exit 0, also in CI); every tool call there needs an explicit `|| exit 1`. Verify a checker by feeding it a known failure. (2026-10-13)
+- **Copy repo scripts into Studio with `execute_luau` + `[==[ … ]==]` long strings, then compare `#Source` with the repo file's byte count minus CRs.** All 8 obby scripts matched byte for byte; this catches transcription slips without reading everything back. (2026-10-13)
+- **`screen_capture` with a far-away `camera_position` (≈300 studs) hung > 120 s; ~200 studs worked.** Keep the camera within ~200 studs of the target. (2026-10-13)
 - **Pin tool versions identically locally and in CI** (`scripts/check-luau.sh`); a StyLua version change can reformat code. (2026-10-13)
 - **Studio UI labels changed (2025/26):** **Test** (F5) not "Play", **Server & Clients** (F7), **File → Experience Settings**, transform tools on keys **2/3/4**, Device **Simulator**. Verify labels against creator-docs before writing click-paths. (2026-10-13)
 
@@ -73,3 +77,7 @@ Entry format:
 - **Every object composited onto a background needs a contact shadow**, otherwise it looks like it floats (HD car icon). (2026-10-13)
 - **Long renders (minutes): run them in the background, commit work in between, and review on a contact sheet next to the reference.** (2026-10-13)
 - **Avoid compositing blurred colour glows over gradients in RGB** — produced muddy brown bands; draw explicit gradient bands instead. (2026-10-13)
+
+## Luau / Roblox API
+
+- **`DataStoreService:GetDataStore()` itself throws in unpublished places ("You must publish this place to the web to access DataStore") — wrap it in `pcall` at module load, not only `GetAsync`/`UpdateAsync`.** The obby's PlayerData module crashed on require, so the whole server script never ran, although the README promised it would play without saving. Found by the first real Studio playtest. (2026-10-13)

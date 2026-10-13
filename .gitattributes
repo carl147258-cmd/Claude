@@ -1,0 +1,4 @@
+# Luau sources always use LF (StyLua and Roblox Studio expect it, also on Windows).
+*.luau text eol=lf
+*.lua text eol=lf
+*.sh text eol=lf
