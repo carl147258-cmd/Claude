@@ -73,3 +73,10 @@ Layers:
 - [ ] Mobile, tablet, console (gamepad) controls tested.
 - [ ] Analytics: `AnalyticsService` custom events for funnel (tutorial steps), economy (sources/sinks), progression.
 - [ ] Update plan for the first 4 weeks.
+
+## Publishing & money facts (as of Oct 2026 — re-verify, they change often)
+- Publishing tiers since May 2026: **Personal** (anyone), **16+** (age check: facial estimation <18, ID ≥18), **All ages** incl. Roblox Kids/Select (ID/age check, 2FA, content maturity questionnaire, Roblox Plus/Premium for 2 consecutive months *or* a one-time 1,000 Robux fee per game refunded after 3 months, plus a threshold of highly engaged age-checked 16+ players — sources say 250–500 within 30–60 days).
+- Marketplace fee on Game Passes/Developer Products: 30 % (creator keeps 70 %).
+- DevEx: $0.0038 per earned Robux since 2025-09-05 (older Robux $0.0035), minimum 30,000 earned Robux, age 13+.
+- Hosting, servers, DataStores and Studio are free; ads are optional with small daily budgets.
+- Full beginner guide in German: `docs/ROBLOX-LEITFADEN.md`; reference project: `games/mein-erstes-obby/`.

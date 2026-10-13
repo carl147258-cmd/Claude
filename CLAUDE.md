@@ -6,3 +6,5 @@ Dieses Repository dient dazu, Roblox-Spiele (Luau) zu entwerfen und zu programmi
 - Antworten auf Deutsch; Code-Bezeichner und Code-Kommentare auf Englisch.
 - Neue Spiele mit Rojo-Struktur starten: `.claude/skills/roblox-game-dev/templates/rojo-starter/` in einen eigenen Ordner unter `games/<spielname>/` kopieren.
 - Immer server-autoritativ arbeiten: der Client sendet nur Absichten, der Server prüft alles.
+- Einsteiger-Leitfaden (Kosten, Regeln, Fahrplan): `docs/ROBLOX-LEITFADEN.md`. Referenzprojekt: `games/mein-erstes-obby/`.
+- Luau-Code vor dem Commit prüfen: `stylua src` und `luau-lsp analyze` mit Roblox-Definitionen (siehe `references/tooling.md`).
