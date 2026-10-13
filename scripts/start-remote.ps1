@@ -31,6 +31,16 @@ Write-Host "== Claude Remote Control startet. Auf dem Handy: Claude-App -> Code 
 Write-Host "   (Leertaste zeigt einen QR-Code zum Verbinden.)"
 
 $claude = (Get-Command claude -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1).Source
+# the native installer puts claude.exe in ~\.local\bin, which may not be on PATH yet
+$localClaude = Join-Path $HOME ".local\bin\claude.exe"
+if (-not $claude -and (Test-Path $localClaude)) {
+    $claude = $localClaude
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($userPath -notlike "*\.local\bin*") {
+        [Environment]::SetEnvironmentVariable("Path", "$userPath;$(Split-Path $localClaude)", "User")
+        Write-Host "   Claude-Ordner zum PATH hinzugefuegt (gilt fuer neue Fenster)."
+    }
+}
 if (-not $claude) {
     Write-Host "Claude Code nicht gefunden. Installieren:  irm https://claude.ai/install.ps1 | iex" -ForegroundColor Red
     Read-Host "Enter zum Beenden"

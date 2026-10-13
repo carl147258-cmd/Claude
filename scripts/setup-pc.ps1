@@ -43,6 +43,16 @@ Write-Host "== 3/4 Claude Code mit Roblox Studio verbinden" -ForegroundColor Cya
 $mcp = Join-Path $env:LOCALAPPDATA "Roblox\mcp.bat"
 # prefer claude.exe / claude.cmd: an npm-installed claude.ps1 may be blocked by the execution policy
 $claude = (Get-Command claude -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1).Source
+# the native installer puts claude.exe in ~\.local\bin, which may not be on PATH yet
+$localClaude = Join-Path $HOME ".local\bin\claude.exe"
+if (-not $claude -and (Test-Path $localClaude)) {
+    $claude = $localClaude
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($userPath -notlike "*\.local\bin*") {
+        [Environment]::SetEnvironmentVariable("Path", "$userPath;$(Split-Path $localClaude)", "User")
+        Write-Host "   Claude-Ordner zum PATH hinzugefuegt (gilt fuer neue Fenster)."
+    }
+}
 if (-not $claude) {
     Write-Host "   Claude Code (Befehl 'claude') nicht gefunden. Installieren: https://code.claude.com" -ForegroundColor Yellow
     Write-Host "   Nutzt du die Claude-Desktop-App? Dann in Studio bei 'Quick connect' Claude Desktop einschalten."
