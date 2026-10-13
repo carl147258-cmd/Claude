@@ -50,7 +50,13 @@ car = Image.open(SRC).convert("RGBA").resize((S, S), Image.LANCZOS)
 bg = background()
 a = car.split()[3]
 solid = a.point(lambda v: 255 if v > 200 else 0)
-M = 60  # margin so the glow is not clipped
+rows = np.where(np.array(solid).max(1) > 0)[0]
+cols = np.where(np.array(solid).max(0) > 0)[0]
+sh = Image.new("L", (S, S), 0)
+ImageDraw.Draw(sh).ellipse([cols.min() + S * 0.02, rows.max() - S * 0.07, cols.max() - S * 0.02, rows.max() + S * 0.025], fill=230)
+shadow = Image.new("RGBA", (S, S), (0, 0, 0, 255))
+shadow.putalpha(sh.filter(ImageFilter.GaussianBlur(S * 0.018)))
+bg.alpha_composite(shadow)
 rim = Image.new("RGBA", (S, S), (60, 220, 255, 0))
 rim.putalpha(solid.filter(ImageFilter.MaxFilter(17)).filter(ImageFilter.GaussianBlur(20)).point(lambda v: int(v * 0.7)))
 bg.alpha_composite(rim)

@@ -59,4 +59,6 @@ Entry format:
 - **Glow/blur layers need a margin larger than the blur radius**, otherwise glows get clipped into hard edges. (2026-10-13)
 - **Car shots: 30–35° FOV from a ¾ front view like the reference photo; keep the whole front in frame.** Wide-angle close-ups made the car look stretched. (2026-10-13)
 - **Putting a daylight photo into a night/neon scene: darken base colour and recolour highlights by luminance into the scene's neon palette.** Untouched tree reflections broke the illusion. (2026-10-13)
+- **Every object composited onto a background needs a contact shadow**, otherwise it looks like it floats (HD car icon). (2026-10-13)
+- **Long renders (minutes): run them in the background, commit work in between, and review on a contact sheet next to the reference.** (2026-10-13)
 - **Avoid compositing blurred colour glows over gradients in RGB** — produced muddy brown bands; draw explicit gradient bands instead. (2026-10-13)
