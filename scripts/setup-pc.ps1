@@ -20,7 +20,7 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     $ErrorActionPreference = "Stop"
 } else {
     $zip = Join-Path $env:TEMP "roblox-claude.zip"
-    Invoke-WebRequest "https://github.com/carl147258-cmd/Claude/archive/refs/heads/$Branch.zip" -OutFile $zip
+    Invoke-WebRequest "https://github.com/carl147258-cmd/Claude/archive/refs/heads/$Branch.zip" -OutFile $zip -UseBasicParsing
     $tmp = Join-Path $env:TEMP "roblox-claude-unzip"
     if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }
     Expand-Archive $zip -DestinationPath $tmp
@@ -41,7 +41,9 @@ Write-Host "   Fotos hier ablegen: $refs"
 
 Write-Host "== 3/4 Claude Code mit Roblox Studio verbinden" -ForegroundColor Cyan
 $mcp = Join-Path $env:LOCALAPPDATA "Roblox\mcp.bat"
-if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
+# prefer claude.exe / claude.cmd: an npm-installed claude.ps1 may be blocked by the execution policy
+$claude = (Get-Command claude -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1).Source
+if (-not $claude) {
     Write-Host "   Claude Code (Befehl 'claude') nicht gefunden. Installieren: https://code.claude.com" -ForegroundColor Yellow
     Write-Host "   Nutzt du die Claude-Desktop-App? Dann in Studio bei 'Quick connect' Claude Desktop einschalten."
 } elseif (-not (Test-Path $mcp)) {
@@ -51,11 +53,13 @@ if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
 } else {
     Push-Location $Target
     $ErrorActionPreference = "Continue"   # native stderr output must not abort Windows PowerShell 5.1
-    $existing = (claude mcp list 2>&1 | Out-String)
+    $existing = (& $claude mcp list 2>&1 | Out-String)
     if ($existing -match "Roblox_Studio") {
         Write-Host "   Schon verbunden."
     } else {
-        claude mcp add Roblox_Studio -- cmd.exe /c $mcp
+        # quote '--' so Windows PowerShell 5.1 passes it through to claude
+        & $claude mcp add Roblox_Studio '--' cmd.exe /c $mcp
+        if ($LASTEXITCODE -ne 0) { Write-Host "   Verbinden fehlgeschlagen - in Studio 'Quick connect' -> Claude Code nutzen." -ForegroundColor Yellow }
         Write-Host "   Verbunden (gilt fuer den Ordner $Target)."
     }
     Pop-Location
