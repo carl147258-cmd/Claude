@@ -40,6 +40,10 @@ Entry format:
 - **Pin tool versions identically locally and in CI** (`scripts/check-luau.sh`); a StyLua version change can reformat code. (2026-10-13)
 - **Studio UI labels changed (2025/26):** **Test** (F5) not "Play", **Server & Clients** (F7), **File → Experience Settings**, transform tools on keys **2/3/4**, Device **Simulator**. Verify labels against creator-docs before writing click-paths. (2026-10-13)
 
+## Gameplay feel
+
+- **Spawns and checkpoints must face the course: a character placed with `PivotTo(part.CFrame)` (and a SpawnLocation) looks along the part's LookVector (−Z).** In the obby players spawned facing away from the course. Build spawn/checkpoint CFrames with `CFrame.lookAt(pos, pos + courseDirection)` and verify the facing in the first playtest screenshot. (2026-10-13)
+
 ## Rojo / model files
 
 - **Rojo `.model.json` needs explicit types for CFrame and UDim2:** `{"CFrame": {"CFrame": {"position": [...], "orientation": [[R00,R01,R02],[R10,...],[R20,...]]}}}` (rows), `{"UDim2": [[1,0],[1,0]]}`. Enums/Vector3/Color3/bool work implicitly. Verify by `rojo build -o x.rbxmx` and checking R02 etc. (2026-10-13)
