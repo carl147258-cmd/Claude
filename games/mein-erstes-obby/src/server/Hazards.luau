@@ -5,7 +5,10 @@
 --   "Disappearing" fades out after being touched, comes back after a few seconds
 
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+
+local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 
 local Hazards = {}
 
@@ -35,11 +38,22 @@ local function setupDisappearing(part: Instance)
 	end
 	local originalTransparency = part.Transparency
 	local busy = false
+	local sound: Sound? = nil
+	if Config.Sounds.Disappear ~= 0 then
+		local s = Instance.new("Sound")
+		s.SoundId = `rbxassetid://{Config.Sounds.Disappear}`
+		s.RollOffMaxDistance = 80 -- only nearby players hear it
+		s.Parent = part
+		sound = s
+	end
 	part.Touched:Connect(function(hit)
 		if busy or not getHumanoid(hit) then
 			return
 		end
 		busy = true
+		if sound then
+			sound:Play()
+		end
 		local fade = TweenService:Create(part, TweenInfo.new(FADE_TIME), { Transparency = 1 })
 		fade:Play()
 		fade.Completed:Wait()

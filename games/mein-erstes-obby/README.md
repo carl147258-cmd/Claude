@@ -54,6 +54,27 @@ Im unveröffentlichten Studio-Projekt wird **nicht gespeichert**. Das Spiel läu
 2. Die **Product ID** kopieren und in `Config.luau` bei `SkipStageProductId` eintragen.
 3. Käufe in Studio sind Testkäufe und kosten nichts. Das Gewähren funktioniert nur mit aktiviertem Speichern (siehe oben). Ein Kauf wird erst bestätigt, wenn er gespeichert ist. So geht kein Kauf verloren und keiner wird doppelt gutgeschrieben.
 
+## Sounds, Icon und Thumbnail
+
+Im Ordner `assets/` liegen selbst erzeugte, lizenzfreie Dateien:
+
+| Datei | Zweck |
+|---|---|
+| `audio/checkpoint.ogg` | Checkpoint erreicht |
+| `audio/death.ogg` | In Lava gefallen |
+| `audio/finish.ogg` | Ziel erreicht |
+| `audio/click.ogg` | Knopf gedrückt |
+| `audio/disappear.ogg` | Plattform verschwindet |
+| `art/icon_512.png` | Spiel-Icon (Creator Dashboard → dein Spiel → Places/Icon) |
+| `art/thumbnail_1920x1080.png` | Vorschaubild für die Spielseite |
+
+So aktivierst du die Sounds:
+1. In Studio **Window → Asset Manager → Import** öffnen und die `.ogg`-Dateien auswählen.
+2. Nach der Moderationsprüfung zu jedem Sound per Rechtsklick die **Asset ID** kopieren.
+3. Die IDs in `Config.luau` unter `Sounds` eintragen. Steht dort 0, bleibt der Sound stumm.
+
+Neu erzeugen oder ändern: `python3 scripts/make_sfx.py games/mein-erstes-obby/assets/audio` und `python3 scripts/make_obby_art.py games/mein-erstes-obby/assets/art`.
+
 ## Anpassen
 
 | Was | Wo |

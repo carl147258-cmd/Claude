@@ -15,4 +15,14 @@ return {
 
 	-- Seconds between automatic saves.
 	AutosaveInterval = 90,
+
+	-- Sound asset IDs (0 = silent). Upload the files from assets/audio/ via
+	-- Studio: Window -> Asset Manager -> Import, then copy each asset ID here.
+	Sounds = {
+		Checkpoint = 0,
+		Death = 0,
+		Finish = 0,
+		Click = 0,
+		Disappear = 0,
+	},
 }

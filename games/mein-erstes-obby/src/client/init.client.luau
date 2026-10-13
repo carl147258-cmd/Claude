@@ -4,10 +4,29 @@
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 
 local player = Players.LocalPlayer
+
+local sounds: { [string]: Sound } = {}
+for name, id in Config.Sounds do
+	if id ~= 0 then
+		local sound = Instance.new("Sound")
+		sound.Name = name
+		sound.SoundId = `rbxassetid://{id}`
+		sound.Parent = script
+		sounds[name] = sound
+	end
+end
+
+local function playSound(name: string)
+	local sound = sounds[name]
+	if sound then
+		SoundService:PlayLocalSound(sound)
+	end
+end
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "ObbyHUD"
@@ -50,6 +69,7 @@ if Config.SkipStageProductId ~= 0 then
 	button.Parent = gui
 
 	button.Activated:Connect(function()
+		playSound("Click")
 		MarketplaceService:PromptProductPurchase(player, Config.SkipStageProductId)
 	end)
 	skipButton = button
@@ -58,6 +78,7 @@ end
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local stageValue = player:WaitForChild("leaderstats"):WaitForChild("Stufe") :: IntValue
+local lastStage = stageValue.Value
 local function refresh()
 	if stageValue.Value >= Config.StageCount then
 		stageLabel.Text = "🏆 Geschafft!"
@@ -67,6 +88,21 @@ local function refresh()
 	if skipButton then
 		skipButton.Visible = stageValue.Value < Config.StageCount
 	end
+	if stageValue.Value > lastStage then
+		playSound(if stageValue.Value >= Config.StageCount then "Finish" else "Checkpoint")
+	end
+	lastStage = stageValue.Value
 end
 stageValue.Changed:Connect(refresh)
 refresh()
+
+local function onCharacterAdded(character: Model)
+	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
+	humanoid.Died:Connect(function()
+		playSound("Death")
+	end)
+end
+player.CharacterAdded:Connect(onCharacterAdded)
+if player.Character then
+	task.spawn(onCharacterAdded, player.Character)
+end

@@ -68,6 +68,10 @@ Read `references/patterns.md` → "Monetization". Game Passes = one-time permane
 
 Read `references/studio-basics.md` whenever you give click-by-click Studio instructions, teach a beginner, or debug "it doesn't work" reports. It covers the current UI layout, shortcuts, property meanings, testing modes, publishing settings and the most common beginner mistakes.
 
+## Art, animation & audio
+
+Read `references/art-audio-animation.md` for visuals (style sheet, lighting, meshes, VFX), animations (procedural, catalog, keyframes, capture) and audio (Creator Store music, synthesized SFX via `scripts/make_sfx.py`, upload limits). It also lists which generators cost the user credits. Always look at generated images before presenting them; Claude cannot hear audio, so say so and let the user listen.
+
 ## Design guidance
 
 Read `references/game-design.md` when the user is planning a new game or asks how to make it fun, popular, or profitable. It covers genre templates (Obby, Tycoon, Simulator, Tower Defense, Horror, Round-based PvP), core loops, retention, onboarding, mobile UI, and Roblox discovery metrics.

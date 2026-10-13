@@ -292,6 +292,24 @@ Hazards        → Lava tötet, Plattformen verschwinden
 4. **Feedback:** Du spielst und sagst, was dir gefällt und was nicht. Ich passe an.
 5. **Nur du entscheidest:** Idee, Name, Stil, Preise, alles was echtes Geld kostet, und die Veröffentlichung.
 
+### Grafik, Animation und Sound
+
+| Bereich | Was ich selbst mache | Wo du gefragt bist |
+|---|---|---|
+| **Welt & Level** (Plattformen, Gebäude, Gelände) | Komplett per Code oder direkt in Studio | Gefällt dir der Look? |
+| **Licht & Stimmung** (Tageszeit, Nebel, Leuchten, Farben) | Komplett | Geschmack |
+| **3D-Modelle** (Deko, Gegenstände, Figuren) | Per KI-Generator in Studio (gratis, Tageslimit), aus dem Creator Store oder per Higgsfield (kostet Credits) | Auswahl; sehr hochwertige Hauptfiguren besser von Künstlern |
+| **Effekte** (Funken, Konfetti, Spuren, Leuchtumrisse) | Komplett per Code | – |
+| **Animationen** | Bewegungen per Code, fertige Roblox-Animationen (z. B. „Ninja Run“), eigene Keyframe-Animationen | Für sehr natürliche Bewegungen: Du nimmst ein Video von dir auf, Roblox macht daraus eine Animation (Animation Capture) |
+| **Soundeffekte** | Selbst erzeugt per Klangsynthese (lizenzfrei) oder aus dem Creator Store | **Anhören musst du**, ich kann nichts hören |
+| **Musik** | Ich suche passende Stücke aus der Roblox-Bibliothek (über 100.000 lizenzierte Titel, gratis) | Du wählst aus 2–3 Vorschlägen |
+| **Sprachausgabe** | Roblox-eigene Text-zu-Sprache oder Higgsfield (Credits) | – |
+| **Icon & Thumbnails** | Gezeichnet per Code oder als echter Screenshot aus dem Spiel mit Text | Du wählst Favoriten |
+
+**Hochladen nach Roblox:** Sounds und Bilder müssen einmal in Roblox hochgeladen werden (Studio: **Window → Asset Manager → Import**). Dabei gibt es eine Moderationsprüfung und Monatslimits: 100 Audios ohne, 2.000 mit Ausweis-Verifizierung. Animationen müssen dem gleichen Konto oder der gleichen Gruppe gehören wie das Spiel.
+
+**Beispiel im Repo:** Für das Obby habe ich 5 Soundeffekte erzeugt (`games/mein-erstes-obby/assets/audio/`) und ein Icon und Thumbnail gezeichnet (`assets/art/`). Die Sounds sind im Spiel schon eingebaut und spielen, sobald du ihre Asset-IDs in `Config.luau` einträgst.
+
 ### Was Claude kostet
 
 | Posten | Kosten | Hinweis |
@@ -299,6 +317,7 @@ Hazards        → Lava tötet, Plattformen verschwinden
 | Claude-Abo mit Claude Code | **Pro ca. 20 $/Monat**, Max ca. 100 $ oder 200 $/Monat | Für den Start reicht Pro. Max lohnt sich nur bei sehr viel täglicher Arbeit, weil die Nutzungsgrenzen höher sind. Aktuelle Preise: [claude.com/pricing](https://claude.com/pricing) |
 | Roblox Studio MCP | 0 € | In Studio eingebaut |
 | GitHub, automatische Code-Prüfung | 0 € | Für öffentliche und kleine private Repos im Gratis-Kontingent |
+| Higgsfield (KI-Bilder, 3D-Modelle, Stimmen) | Gratis-Tarif mit wenigen Credits, mehr kostet ein Abo | Optional. Ich frage vor jeder Nutzung und nenne die Kosten vorher. |
 
 Die Claude-Preise stammen von Vergleichsseiten, nicht direkt von Anthropic. Maßgeblich ist die Preisseite.
 
