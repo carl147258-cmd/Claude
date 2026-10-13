@@ -1,7 +1,7 @@
 # Starts Claude Code in Remote Control mode inside the project folder and keeps the PC awake
 # while it runs, so the session can be continued from the Claude app on the phone (Code tab).
 # Started by double-clicking "Roblox-Claude Remote" on the desktop (created by setup-pc.ps1).
-$Target = Join-Path $HOME "Roblox-Claude"
+$Target = Split-Path $PSScriptRoot -Parent   # project folder = parent of scripts\
 Set-Location $Target
 
 Write-Host "== Projekt aktualisieren" -ForegroundColor Cyan

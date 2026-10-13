@@ -5,7 +5,7 @@
 set -euo pipefail
 
 BRANCH="claude/obby-und-leitfaden"
-TARGET="$HOME/Roblox-Claude"
+TARGET="$HOME/Desktop/Roblox"
 
 echo "== 1/4 Projekt herunterladen nach $TARGET"
 if command -v git >/dev/null 2>&1; then

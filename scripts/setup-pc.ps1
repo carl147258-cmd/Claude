@@ -4,7 +4,22 @@
 $ErrorActionPreference = "Stop"
 
 $Branch = "claude/obby-und-leitfaden"
-$Target = Join-Path $HOME "Roblox-Claude"
+# project folder on the desktop (with OneDrive: C:\Users\<name>\OneDrive\Desktop\Roblox)
+$Target = Join-Path ([Environment]::GetFolderPath("Desktop")) "Roblox"
+$OldTarget = Join-Path $HOME "Roblox-Claude"   # location used by earlier versions of this script
+
+function Test-NonEmptyDir($path) { (Test-Path $path) -and [bool](Get-ChildItem $path -Force -ErrorAction SilentlyContinue | Select-Object -First 1) }
+
+# move an existing checkout from the old location (keeps git history and refs\ photos)
+if ((Test-Path (Join-Path $OldTarget ".git")) -and -not (Test-NonEmptyDir $Target)) {
+    try {
+        if (Test-Path $Target) { Remove-Item $Target -Force }
+        Move-Item $OldTarget $Target -ErrorAction Stop
+        Write-Host "== Projekt umgezogen: $OldTarget -> $Target" -ForegroundColor Cyan
+    } catch {
+        Write-Host "   Umzug nicht moeglich (Ordner in Benutzung?). Remote-Fenster schliessen und Skript erneut starten." -ForegroundColor Yellow
+    }
+}
 
 Write-Host "== 1/4 Projekt herunterladen nach $Target" -ForegroundColor Cyan
 if (Get-Command git -ErrorAction SilentlyContinue) {
@@ -13,6 +28,13 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
         git -C $Target fetch origin $Branch
         git -C $Target checkout $Branch
         git -C $Target pull origin $Branch
+    } elseif (Test-NonEmptyDir $Target) {
+        # folder already holds the user's files: add the project without touching them
+        git -C $Target init -q
+        git -C $Target remote add origin https://github.com/carl147258-cmd/Claude.git
+        git -C $Target fetch origin $Branch
+        git -C $Target checkout -b $Branch --track "origin/$Branch"
+        if ($LASTEXITCODE -ne 0) { Write-Host "   Gleichnamige Dateien im Ordner verhindern den Download - bitte umbenennen." -ForegroundColor Yellow }
     } else {
         git clone --branch $Branch https://github.com/carl147258-cmd/Claude.git $Target
     }
@@ -37,6 +59,11 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
 Write-Host "== 2/4 Ordner fuer deine Auto-Fotos anlegen" -ForegroundColor Cyan
 $refs = Join-Path $Target "refs\auto"
 New-Item -ItemType Directory -Force -Path $refs | Out-Null
+$oldRefs = Join-Path $OldTarget "refs"
+if (Test-Path $oldRefs) {
+    Copy-Item (Join-Path $oldRefs "*") (Join-Path $Target "refs") -Recurse -Force
+    Write-Host "   Fotos aus $OldTarget uebernommen. Den alten Ordner kannst du loeschen."
+}
 Write-Host "   Fotos hier ablegen: $refs"
 
 Write-Host "== 3/4 Claude Code mit Roblox Studio verbinden" -ForegroundColor Cyan

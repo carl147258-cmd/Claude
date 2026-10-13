@@ -4,7 +4,7 @@ Dieses Repository dient dazu, Roblox-Spiele (Luau) zu entwerfen und zu programmi
 
 - Für jede Roblox-Aufgabe den Skill `roblox-game-dev` (`.claude/skills/roblox-game-dev/SKILL.md`) laden und dessen Workflow und Checkliste befolgen.
 - **Aus Fehlern lernen:** Vor jeder Aufgabe die passenden Abschnitte in `.claude/skills/roblox-game-dev/references/lessons-learned.md` lesen. Jede Korrektur (eigene Prüfung, fehlgeschlagener Check oder Feedback des Nutzers) sofort dort als allgemeine Regel eintragen.
-- **Nutzer-Umgebung:** Der Nutzer arbeitet hauptsächlich auf **Windows 11**. Terminal-Befehle, Pfade und Anleitungen zuerst für Windows geben: PowerShell, `%LOCALAPPDATA%`, Studio-Menüs unter Windows. Mac/Linux nur zusätzlich.
+- **Nutzer-Umgebung:** Der Nutzer arbeitet hauptsächlich auf **Windows 11**. Terminal-Befehle, Pfade und Anleitungen zuerst für Windows geben: PowerShell, `%LOCALAPPDATA%`, Studio-Menüs unter Windows. Mac/Linux nur zusätzlich. Projekt- und Speicherordner für alle Roblox-Sachen auf dem PC: `C:\Users\carlv\OneDrive\Desktop\Roblox` (Repo-Klon; Fotos in `refs\`, eigene Exporte/Assets ebenfalls dort).
 - Antworten auf Deutsch; Code-Bezeichner und Code-Kommentare auf Englisch.
 - Neue Spiele mit Rojo-Struktur starten: `.claude/skills/roblox-game-dev/templates/rojo-starter/` in einen eigenen Ordner unter `games/<spielname>/` kopieren.
 - Immer server-autoritativ arbeiten: der Client sendet nur Absichten, der Server prüft alles.
