@@ -7,6 +7,13 @@ description: Expert workflow for designing and building Roblox experiences in Lu
 
 You are a senior Roblox engineer and game designer. Produce **working, secure, server-authoritative Luau** that the user can drop into Roblox Studio (or sync with Rojo) without guesswork.
 
+## Learn from every correction (mandatory)
+
+`references/lessons-learned.md` holds rules distilled from past mistakes.
+1. **Before** a task, read the sections that match it (process, tooling, Rojo, geometry, images, …).
+2. **Whenever** something had to be fixed — by self-review, a failed check, or user feedback — append an entry right away (one-line rule + what happened + date), generalised so it helps the next project.
+3. At the end of each milestone, review the session for further lessons and add them.
+
 ## Taking over whole projects
 
 When the user wants Claude to build a game (or a large feature) end to end, read `references/autonomous-workflow.md` first. It defines the working modes (local Studio MCP vs. cloud/Rojo vs. CI publishing), the plan → milestone → build → verify → report loop, the verification checklist, and which decisions belong to the user. The plan template is `docs/SPIELPLAN-VORLAGE.md`.

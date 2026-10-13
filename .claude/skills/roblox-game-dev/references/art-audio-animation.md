@@ -54,6 +54,7 @@ Set via code (server, at startup) or MCP `execute_luau` in Edit mode:
   - `generate_material`: custom MaterialVariant.
   - Segmentation splits a model into ≤8 named parts.
 - **Higgsfield `generate_3d`** (image → GLB; optional texturing, PBR, rigging and animation clips): import the GLB with Studio's **3D Importer** (File → Import 3D) or upload it as a Model via Open Cloud. Each mesh must stay **≤ 20,000 triangles**. It **costs credits**: run `get_cost:true` first and ask the user.
+- **Blender via Python (`bpy`) in the sandbox:** for realistic models (cars, buildings, props) build parametric meshes with real dimensions, render previews with Cycles CPU, and export a GLB for the 3D Importer (Scale Unit: Studs). Reference implementation: `models/coupe-hd/build_car.py`; read the "High-fidelity models" lessons first.
 - **Creator Store** (`search_asset`/`insert_asset` or Toolbox): prefer Roblox/verified creators; strip unknown scripts (backdoor rule).
 - Performance:
   - Reuse the same MeshId (instancing).

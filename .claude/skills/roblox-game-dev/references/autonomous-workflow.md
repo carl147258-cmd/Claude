@@ -30,7 +30,8 @@ Network note: this cloud environment's proxy blocks `*.roblox.com`. Open Cloud c
 3. **Build** a milestone end to end. Reuse `references/patterns.md`. Keep the Rojo layout from `templates/rojo-starter`.
 4. **Verify** (§4) before reporting done. Never claim it works without evidence.
 5. **Report** in German: what was built, how to try it (exact clicks), what was verified and how, and what's open. Then ask for feedback or the go for the next milestone.
-6. **Commit** per milestone on a feature branch; PR with checklist.
+6. **Retro:** add every correction made during the milestone to `references/lessons-learned.md` as a general rule.
+7. **Commit** per milestone on a feature branch; PR with checklist.
 
 ## 3. Building in mode A (Studio MCP)
 
