@@ -18,9 +18,14 @@ Entry format:
 - **Decide the fidelity strategy first:** primitive parts give a blocky "Roblox" look; "as close to the original as possible" needs meshes (Blender → 3D Importer). Switching late wastes iterations. (2026-10-13)
 - **State what could not be verified** (no Studio access, can't hear audio) and give the user a concrete check. (2026-10-13)
 
+- **Never call a result "faithful/originalgetreu" unless a side-by-side with the reference supports it.** The user judged the procedural HD coupe "not at all faithful" although I had presented it as such. Describe it honestly ("inspired by", "proportions match") and let the user judge. (2026-10-13)
+- **Real-world replicas (cars, buildings) need proper references before modelling:** 3–4 photos of the whole object (front ¾, side, rear ¾, front; doors closed, nothing cut off) or blueprints. A single cropped photo with an open door cannot produce a faithful model — ask for references first. (2026-10-13)
+
 ## Environment & tooling
 
 - **`*.roblox.com` is blocked in the cloud sandbox; GitHub (raw, releases, git) works.** Read docs from `github.com/Roblox/creator-docs` (sparse clone of `content/en-us/...`); run Selene (needs the Roblox API dump) only in CI. (2026-10-13)
+- **The sandbox proxy blocks uploads to Higgsfield (`upload.higgsfield.ai`).** Have the user upload images via `media_upload_widget`, or ask them to allow the host in the environment's network settings. (2026-10-13)
+- **Photo → 3D options (Oct 2026):** Tripo H3.1 multiview (2–4 views, detailed, textured) ≈ 18 Higgsfield credits; Meshy 7 single image textured+PBR ≈ 38 credits; Roblox Studio Assistant `/generate_mesh` with a reference image is free (rate-limited, ~10k triangles). Always preflight with `get_cost:true`. Strip logos and real plates from the input image first. (2026-10-13)
 - **Pin tool versions identically locally and in CI** (`scripts/check-luau.sh`); a StyLua version change can reformat code. (2026-10-13)
 - **Studio UI labels changed (2025/26):** **Test** (F5) not "Play", **Server & Clients** (F7), **File → Experience Settings**, transform tools on keys **2/3/4**, Device **Simulator**. Verify labels against creator-docs before writing click-paths. (2026-10-13)
 
