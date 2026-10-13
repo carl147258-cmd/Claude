@@ -2,7 +2,23 @@
 
 So arbeitet Claude direkt in deinem Studio: bauen, Scripts schreiben, Testspiele starten, Screenshots ansehen. Und das mit dem ganzen Wissen aus diesem Repo (Skill, Lern-Datei, Modelle).
 
-## 1. Repo auf den PC holen (einmalig)
+## Schnellstart: alles mit einem Befehl
+
+**Windows:** PowerShell öffnen (Startmenü → „PowerShell“) und einfügen:
+
+```powershell
+irm https://raw.githubusercontent.com/carl147258-cmd/Claude/claude/obby-und-leitfaden/scripts/setup-pc.ps1 | iex
+```
+
+**Mac:** Terminal öffnen und einfügen:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/carl147258-cmd/Claude/claude/obby-und-leitfaden/scripts/setup-pc.sh | bash
+```
+
+Das Skript lädt das Projekt nach `Roblox-Claude` in deinem Benutzerordner, legt den Fotoordner `refs/auto` an und verbindet Claude Code mit Roblox Studio (falls Studio-MCP schon eingeschaltet ist). Es kann jederzeit erneut ausgeführt werden, um zu aktualisieren. Danach weiter mit Schritt 4 und 5 unten.
+
+## 1. Repo auf den PC holen (einmalig, falls ohne Skript)
 
 Im Terminal (Windows: „Eingabeaufforderung“ oder PowerShell):
 
