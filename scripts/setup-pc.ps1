@@ -65,9 +65,18 @@ if (-not $claude) {
     Pop-Location
 }
 
+Write-Host "== Desktop-Verknuepfung 'Roblox-Claude Remote' anlegen" -ForegroundColor Cyan
+$desktop = [Environment]::GetFolderPath("Desktop")
+$bat = Join-Path $desktop "Roblox-Claude Remote.bat"
+Set-Content -Path $bat -Encoding ASCII -Value @(
+    "@echo off",
+    "powershell -NoProfile -ExecutionPolicy Bypass -File `"$Target\scripts\start-remote.ps1`""
+)
+Write-Host "   Doppelklick darauf startet Claude fuer die Fernsteuerung vom Handy."
+
 Write-Host "== 4/4 Fertig" -ForegroundColor Green
 Write-Host "Naechste Schritte:"
 Write-Host "  1. 4 Fotos deines Autos nach $refs legen (Tueren zu, ganzes Auto im Bild)."
 Write-Host "  2. Roblox Studio oeffnen (Baseplate), MCP-Server muss eingeschaltet sein."
-Write-Host "  3. Im Terminal:  cd `"$Target`"   und dann   claude"
-Write-Host "  4. Den Auftrag aus docs\LOKAL-STARTEN.md (Abschnitt 5) einfuegen."
+Write-Host "  3. Auf dem Desktop 'Roblox-Claude Remote' doppelklicken (startet Claude fuer das Handy)."
+Write-Host "  4. Auf dem Handy: Claude-App -> Code -> Sitzung oeffnen -> Auftrag aus docs\LOKAL-STARTEN.md einfuegen."
