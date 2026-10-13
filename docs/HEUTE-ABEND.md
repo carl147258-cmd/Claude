@@ -11,6 +11,12 @@ Ziel: In etwa 10–15 Minuten ist dein Windows-11-PC fertig. Danach läuft Claud
   4. genau von vorne
 - [ ] In der **Claude-App** mit demselben Konto angemeldet sein wie später am PC.
 
+## Am einfachsten: eine Datei doppelklicken
+
+Lade **`scripts/Roblox-Claude-Einrichten.bat`** herunter (aus dem Chat oder von GitHub) und lege sie auf den Desktop. Ein Doppelklick erledigt die Schritte 3 und 4 unten auf einmal: Claude Code installieren (falls nötig), Projekt laden, Studio verbinden, Verknüpfung „Roblox-Claude Remote“ anlegen.
+
+Windows warnt beim ersten Start evtl. mit „Der Computer wurde durch Windows geschützt“: auf **Weitere Informationen → Trotzdem ausführen** klicken. Die Datei enthält nur die beiden Download-Befehle aus dieser Anleitung.
+
 ## Zu Hause am PC (Windows 11)
 
 | # | Schritt | Dauer |
