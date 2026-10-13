@@ -221,7 +221,7 @@ return PlayerData
 
 Key facts:
 - Max value size per key: 4 MB; keys ≤ 50 chars. Request budgets scale with player count — don't save on every coin change, mark dirty and autosave.
-- Studio: Game Settings → Security → "Enable Studio Access to API Services" (place must be published).
+- Studio: File → Experience Settings → Security → "Enable Studio Access to API Services" (place must be published).
 - Never store Instances; store plain tables, strings, numbers, booleans. Store item **IDs**, not item objects.
 - GDPR/right-to-erasure requests arrive by message; delete with `RemoveAsync(key)`.
 

@@ -152,7 +152,7 @@ Zur Mindestzahl stark engagierter 16+-Spieler machen die Quellen unterschiedlich
 | 5 | **Exploiter (Cheater)** | Cheater können alles am Client verändern und jedes RemoteEvent mit falschen Daten aufrufen | Alles serverseitig prüfen. Unser Obby zählt nur die *nächste* Stufe. |
 | 6 | **Datenverlust** | Falsches Speichern = Spieler verlieren Fortschritt = schlechte Bewertungen | Bewährtes Speichersystem (ist eingebaut), mit 2 Spielern und Server-Neustart testen |
 | 7 | **Backdoors in Gratis-Modellen** | Modelle aus der Toolbox können **versteckte Schadscripts** enthalten. Damit können andere dein Spiel übernehmen. | Nur vertrauenswürdige Modelle nutzen, jedes Modell nach `Script`/`require(` durchsuchen, Scripts löschen, die du nicht verstehst |
-| 8 | **Handys** | Die meisten Spieler spielen am Handy: kleine Bildschirme, keine Tastatur, schwächere Geräte | Große Knöpfe, Testen im **Device Emulator** in Studio, wenige Teile |
+| 8 | **Handys** | Die meisten Spieler spielen am Handy: kleine Bildschirme, keine Tastatur, schwächere Geräte | Große Knöpfe, Testen mit dem **Device Simulator** in Studio, wenige Teile |
 | 9 | **Leistung (Lag)** | Zu viele Teile/Scripts → Ruckeln | Teile verankern (Anchored), Effekte auf dem Client, MicroProfiler (Strg+F6) |
 | 10 | **Regeln & Moderation** | Verstöße gegen Community-Standards → Spiel oder Account gesperrt | Keine fremden Marken/Musik, Spielertext filtern, keine Links nach außen, ehrlicher Reife-Fragebogen |
 | 11 | **Faire Monetarisierung** | Pay-to-win vertreibt Spieler. Glücksspiel-ähnliche Käufe (Lootboxen) sind in manchen Ländern verboten. | Bequemlichkeit und Kosmetik verkaufen. Lootboxen nur mit `PolicyService`-Prüfung. |
@@ -168,12 +168,12 @@ Zur Mindestzahl stark engagierter 16+-Spieler machen die Quellen unterschiedlich
 
 - [ ] Roblox-Account mit **2FA** absichern.
 - [ ] Roblox Studio installieren, einloggen.
-- [ ] In Studio: **View → Explorer, Properties, Output** einschalten. Diese drei Fenster brauchst du immer.
+- [ ] In Studio über das Menü **Window** die Fenster **Explorer**, **Properties** und **Output** öffnen. Diese drei Fenster brauchst du immer.
 
 ### Woche 1–2: Studio-Grundlagen
 
 - [ ] Bewegen in der 3D-Ansicht: rechte Maustaste + WASD, Mausrad.
-- [ ] Teile einfügen, verschieben, skalieren, drehen (Tasten: Strg+2 / Strg+3 / Strg+4).
+- [ ] Teile einfügen, verschieben, skalieren, drehen (Tasten: 2 = Verschieben, 3 = Skalieren, 4 = Drehen).
 - [ ] Eigenschaften ändern: Farbe, Material, **Anchored**, **CanCollide**.
 - [ ] Das erste Script: ein Teil, das bei Berührung tötet.
 - [ ] Verstehen: **Script** (Server) vs. **LocalScript** (Client) vs. **ModuleScript** (wiederverwendbarer Code).
@@ -189,7 +189,7 @@ Zur Mindestzahl stark engagierter 16+-Spieler machen die Quellen unterschiedlich
 ### Woche 4–5: Testen und Veröffentlichen
 
 - [ ] Als **privat** veröffentlichen, Speichern testen, mit 2 Spielern testen.
-- [ ] Am Handy testen (Device Emulator + echtes Handy).
+- [ ] Am Handy testen (Device Simulator + echtes Handy).
 - [ ] Freunde/Familie spielen lassen. **Beobachte schweigend**, wo sie hängen bleiben.
 - [ ] Alterscheck machen → für **16+** veröffentlichen.
 - [ ] Fragebogen zur Inhaltsreife ausfüllen, Beschreibung, Genre einstellen.

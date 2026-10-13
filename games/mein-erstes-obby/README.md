@@ -13,8 +13,8 @@ Ein komplettes, spielbares Obby (Hindernis-Parcours) als Startprojekt:
 ## Variante A: Nur Roblox Studio (empfohlen für den Anfang)
 
 1. Roblox Studio öffnen → **New** → Vorlage **Baseplate**.
-2. Oben **View** → **Explorer** und **Properties** einschalten.
-3. Lege die Objekte genau so an. Rechtsklick auf den Ordner → **Insert Object**. Die Namen müssen exakt stimmen.
+2. Falls nicht sichtbar: über das Menü **Window** die Fenster **Explorer**, **Properties** und **Output** öffnen.
+3. Lege die Objekte genau so an. Im Explorer mit der Maus über den Ordner fahren, auf **⊕** klicken (oder Strg+I) und den Typ eintippen. Umbenennen geht mit F2 oder Doppelklick auf den Namen. Die Namen müssen exakt stimmen.
 
    | Wo im Explorer | Typ | Name | Inhalt aus Datei |
    |---|---|---|---|
@@ -28,9 +28,9 @@ Ein komplettes, spielbares Obby (Hindernis-Parcours) als Startprojekt:
    | ServerScriptService/Server | ModuleScript | `Monetization` | `src/server/Monetization.luau` |
    | StarterPlayer/StarterPlayerScripts | **LocalScript** | `Client` | `src/client/init.client.luau` |
 
-   Die ModuleScripts unter `Server` müssen **Kinder** des Scripts `Server` sein. Rechtsklick auf `Server` → Insert Object → ModuleScript.
+   Die ModuleScripts unter `Server` müssen **Kinder** des Scripts `Server` sein. Dafür auf `Server` mit **⊕** ein ModuleScript einfügen.
 4. Den Inhalt jeder Datei komplett hineinkopieren. Vorhandenen Code wie `print("Hello world!")` vorher löschen.
-5. **Play** (F5) drücken. Der Parcours erscheint, und du startest auf Stufe 1.
+5. Oben links auf **Test** klicken (oder F5). Der Parcours erscheint, und du startest auf Stufe 1.
 
 ## Variante B: Mit Rojo und VS Code
 
@@ -44,9 +44,9 @@ rojo serve               # in Studio: Rojo-Plugin → Connect
 Im unveröffentlichten Studio-Projekt wird **nicht gespeichert**. Das Spiel läuft trotzdem, und im Output-Fenster erscheint eine Warnung. Zum Testen des Speicherns:
 
 1. **File → Publish to Roblox** (zuerst als privates Spiel).
-2. **Home → Game Settings → Security → „Enable Studio Access to API Services“** einschalten.
+2. **File → Experience Settings → Security → „Enable Studio Access to API Services“** einschalten → **Save**. Mach das nur in einer Testkopie, nicht im Live-Spiel. Studio würde sonst echte Spielstände überschreiben.
 3. Spielen, ein paar Stufen schaffen, stoppen, erneut spielen. Du solltest auf deiner Stufe starten.
-4. Mit mehreren Spielern testen: **Test → Clients and Servers → 2 Players → Start**.
+4. Mit mehreren Spielern testen: oben links im Test-Menü **Server & Clients** wählen, 2 Clients einstellen und auf Play klicken (oder F7).
 
 ## „Stufe überspringen“ einschalten
 
