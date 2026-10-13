@@ -15,8 +15,9 @@ Stand: Oktober 2026. Zahlen zu Kosten und Regeln ändern sich bei Roblox häufig
 7. [Fahrplan: Von null zum ersten Spiel](#7-fahrplan)
 8. [Unser Projekt: „Mein erstes Obby“](#8-unser-projekt-mein-erstes-obby)
 9. [Nach dem Start: Spieler gewinnen und halten](#9-nach-dem-start)
-10. [Lernquellen](#10-lernquellen)
-11. [Quellen dieses Leitfadens](#11-quellen)
+10. [Zusammenarbeit mit Claude: Du planst, Claude baut](#10-zusammenarbeit-mit-claude-du-planst-claude-baut)
+11. [Lernquellen](#11-lernquellen)
+12. [Quellen dieses Leitfadens](#12-quellen)
 
 ---
 
@@ -259,7 +260,55 @@ Hazards        → Lava tötet, Plattformen verschwinden
 
 ---
 
-## 10. Lernquellen
+## 10. Zusammenarbeit mit Claude: Du planst, Claude baut
+
+### Zwei Arbeitsweisen
+
+| | **A. Claude direkt in Roblox Studio** (empfohlen) | **B. Claude in der Cloud** (so wie jetzt) |
+|---|---|---|
+| Wie | Claude Code läuft auf deinem PC. Studio ist über die offizielle Roblox-Schnittstelle (Studio MCP) verbunden. | Claude schreibt Code ins GitHub-Repo, du holst ihn in Studio. |
+| Was Claude kann | Spielwelt lesen und bauen, Scripts schreiben, **Testspiele selbst starten**, Fehler im Output lesen, **Screenshots ansehen**, Spieler-Eingaben simulieren | Code schreiben, Welten per Code erzeugen, Code automatisch prüfen (Format, Fehler, Typen) |
+| Was du machst | Plan geben, Ergebnisse anspielen, Feedback geben, Aktionen bestätigen | Plan geben, Code in Studio übernehmen, testen, Fehler zurückmelden |
+| Selbstständigkeit | **Hoch**: Claude prüft selbst, ob es funktioniert | Mittel: Testen in Studio bleibt bei dir |
+
+**Einrichtung A (einmalig, ca. 15 Minuten):**
+1. Claude Code auf deinem PC installieren (Anleitung: [code.claude.com](https://code.claude.com)) und dieses GitHub-Repo auf deinen PC klonen.
+2. Roblox Studio aktualisieren und dein Spiel öffnen.
+3. In Studio: **Assistant** → **…** → **Manage MCP Servers** → **Enable Studio as MCP server** einschalten.
+4. Darunter bei **Quick connect** den Eintrag **Claude Code** einschalten.
+5. Studio und Claude Code neu starten. Ein grüner Punkt zeigt die Verbindung an.
+6. Claude Code im Repo-Ordner starten. Ich lade dann automatisch das ganze Roblox-Wissen aus diesem Repo.
+
+**Sicherheit:** Verbinde nur Programme, denen du vertraust. Die Schnittstelle kann deine geöffneten Spiele verändern. Lege Sicherungen an (File → Save to File) und arbeite an einer Testkopie, nicht am Live-Spiel.
+
+### So läuft ein Projekt ab
+
+1. **Plan:** Du füllst [`SPIELPLAN-VORLAGE.md`](SPIELPLAN-VORLAGE.md) aus, alleine oder mit mir im Gespräch. Was offen ist, schlage ich vor.
+2. **„Go“:** Ich setze Meilenstein für Meilenstein um. Jeder Meilenstein ist für sich spielbar.
+3. **Bericht:** Nach jedem Meilenstein bekommst du von mir:
+   - was gebaut wurde
+   - wie du es ausprobierst
+   - was ich geprüft habe und was noch offen ist
+4. **Feedback:** Du spielst und sagst, was dir gefällt und was nicht. Ich passe an.
+5. **Nur du entscheidest:** Idee, Name, Stil, Preise, alles was echtes Geld kostet, und die Veröffentlichung.
+
+### Was Claude kostet
+
+| Posten | Kosten | Hinweis |
+|---|---|---|
+| Claude-Abo mit Claude Code | **Pro ca. 20 $/Monat**, Max ca. 100 $ oder 200 $/Monat | Für den Start reicht Pro. Max lohnt sich nur bei sehr viel täglicher Arbeit, weil die Nutzungsgrenzen höher sind. Aktuelle Preise: [claude.com/pricing](https://claude.com/pricing) |
+| Roblox Studio MCP | 0 € | In Studio eingebaut |
+| GitHub, automatische Code-Prüfung | 0 € | Für öffentliche und kleine private Repos im Gratis-Kontingent |
+
+Die Claude-Preise stammen von Vergleichsseiten, nicht direkt von Anthropic. Maßgeblich ist die Preisseite.
+
+### Optional: Automatisch veröffentlichen
+
+Mit einem **Open-Cloud-API-Schlüssel** (Creator Dashboard → Open Cloud → API Keys) kann GitHub jede fertige Version automatisch in ein **Test-Spiel** hochladen. Den Schlüssel trägst du selbst als GitHub-Secret ein. **Schick ihn nie in den Chat.** Das richten wir ein, sobald dein erstes Spiel steht.
+
+---
+
+## 11. Lernquellen
 
 | Quelle | Wofür |
 |---|---|
@@ -271,7 +320,7 @@ Hazards        → Lava tötet, Plattformen verschwinden
 
 ---
 
-## 11. Quellen
+## 12. Quellen
 
 Die Kosten- und Regelangaben stammen aus diesen Quellen. Wo sie sich widersprechen, steht es oben dabei.
 
@@ -285,3 +334,7 @@ Die Kosten- und Regelangaben stammen aus diesen Quellen. Wo sie sich widersprech
 - [Roblox DevForum: Unified Marketplace Fee for Dev Products and Game Passes (30 %)](https://devforum.roblox.com/t/unified-marketplace-fee-for-dev-products-and-game-passes/507109)
 - [Roblox Docs: Ads Manager](https://create.roblox.com/docs/production/promotion/ads-manager)
 - DevEx-Kurs und Minimum (Drittseiten, nicht offiziell): [devex.gg](https://devex.gg/), [BloxToolbox](https://bloxtoolbox.com/pages/tools/devex-cashout-calculator.html), [generalistprogrammer.com](https://generalistprogrammer.com/tools/robux-to-usd-calculator), [bloxsniper.cc](https://bloxsniper.cc/tools/devex-calculator)
+- [Roblox Docs: Connect to the Roblox Studio MCP server](https://github.com/Roblox/creator-docs/blob/main/content/en-us/studio/mcp.md)
+- [Roblox Docs: Usage guide for place publishing](https://github.com/Roblox/creator-docs/blob/main/content/en-us/cloud/guides/usage-place-publishing.md)
+- [Roblox: place-ci-cd-demo](https://github.com/Roblox/place-ci-cd-demo)
+- Claude-Preise (Drittseiten): [superblocks.com](https://www.superblocks.com/blog/claude-code-pricing), [noqta.tn](https://www.noqta.tn/blog/claude-code-pricing-2026)

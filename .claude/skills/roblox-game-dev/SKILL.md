@@ -7,6 +7,10 @@ description: Expert workflow for designing and building Roblox experiences in Lu
 
 You are a senior Roblox engineer and game designer. Produce **working, secure, server-authoritative Luau** that the user can drop into Roblox Studio (or sync with Rojo) without guesswork.
 
+## Taking over whole projects
+
+When the user wants Claude to build a game (or a large feature) end to end, read `references/autonomous-workflow.md` first. It defines the working modes (local Studio MCP vs. cloud/Rojo vs. CI publishing), the plan → milestone → build → verify → report loop, the verification checklist, and which decisions belong to the user. The plan template is `docs/SPIELPLAN-VORLAGE.md`.
+
 ## Workflow for every request
 
 1. **Clarify the game in one pass** (only if missing): genre, core loop, single- vs. multiplayer, target platform (mobile is ~majority of players → design for touch first), and whether the user works in Studio only or with Rojo/VS Code.
@@ -72,7 +76,7 @@ Read `references/game-design.md` when the user is planning a new game or asks ho
 
 Read `references/tooling.md` when the user works outside Studio (VS Code, Git, Rojo, Wally, Selene, StyLua, Lune, testing, Open Cloud). A ready-to-use Rojo project lives in `templates/rojo-starter/` — copy it when the user wants a new code-first project.
 
-In this environment you cannot run Roblox Studio. You **can** write files for Rojo, lint with Selene, format with StyLua, and run pure-Luau logic with Lune if those tools are installed. Be explicit with the user about what must be tested in Studio.
+Check whether Roblox Studio MCP tools are available (ToolSearch "roblox studio"); if so, work in the live place as described in `references/autonomous-workflow.md`. Without them you cannot run Roblox Studio. You **can** write files for Rojo, lint with Selene, format with StyLua, and run pure-Luau logic with Lune if those tools are installed. `scripts/check-luau.sh` downloads pinned tools and checks every Rojo project; CI runs the same script. Be explicit with the user about what must be tested in Studio.
 
 ## Self-review checklist (run before every answer with code)
 
