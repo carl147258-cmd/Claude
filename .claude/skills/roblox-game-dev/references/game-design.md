@@ -51,7 +51,7 @@ Layers:
 - Grant an early win (first upgrade within 30 s).
 
 ## Mobile-first
-- Most Roblox players are on phones: big buttons, `Scale`-based UI, no hover-only info, test with Studio's Device Emulator.
+- Most Roblox players are on phones: big buttons, `Scale`-based UI, no hover-only info, test with Studio's Device Simulator.
 - Keep part count and unique meshes low; use `StreamingEnabled`; avoid many `Unanchored` parts.
 - Use `ContextActionService:BindAction(..., true)` to create on-screen buttons automatically for mobile.
 
@@ -69,7 +69,14 @@ Layers:
 ## Launch checklist
 - [ ] Icon (512×512) and thumbnails (1920×1080) that show gameplay clearly.
 - [ ] Description with keywords; correct genre; maturity questionnaire completed.
-- [ ] Data saving tested with "Start Server + 2 Players" and real server shutdown.
+- [ ] Data saving tested with Test → "Server & Clients" (F7) with 2 clients and real server shutdown.
 - [ ] Mobile, tablet, console (gamepad) controls tested.
 - [ ] Analytics: `AnalyticsService` custom events for funnel (tutorial steps), economy (sources/sinks), progression.
 - [ ] Update plan for the first 4 weeks.
+
+## Publishing & money facts (as of Oct 2026 — re-verify, they change often)
+- Publishing tiers since May 2026: **Personal** (anyone), **16+** (age check: facial estimation <18, ID ≥18), **All ages** incl. Roblox Kids/Select (ID/age check, 2FA, content maturity questionnaire, Roblox Plus/Premium for 2 consecutive months *or* a one-time 1,000 Robux fee per game refunded after 3 months, plus a threshold of highly engaged age-checked 16+ players — sources say 250–500 within 30–60 days).
+- Marketplace fee on Game Passes/Developer Products: 30 % (creator keeps 70 %).
+- DevEx: $0.0038 per earned Robux since 2025-09-05 (older Robux $0.0035), minimum 30,000 earned Robux, age 13+.
+- Hosting, servers, DataStores and Studio are free; ads are optional with small daily budgets.
+- Full beginner guide in German: `docs/ROBLOX-LEITFADEN.md`; reference project: `games/mein-erstes-obby/`.

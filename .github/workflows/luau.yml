@@ -1,0 +1,18 @@
+name: Luau checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/cache@v5
+        with:
+          path: .tools
+          key: luau-tools-${{ hashFiles('scripts/check-luau.sh') }}
+      - name: Format, lint and type-check
+        run: scripts/check-luau.sh

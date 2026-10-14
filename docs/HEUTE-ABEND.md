@@ -1,0 +1,47 @@
+# Checkliste: PC einrichten und dann vom Handy weiterarbeiten
+
+Ziel: In etwa 10–15 Minuten ist dein Windows-11-PC fertig. Danach läuft Claude dort weiter, Roblox Studio bleibt offen, und du steuerst alles unterwegs über die **Claude-App → Code**.
+
+## Jetzt schon, unterwegs (mit dem Handy)
+
+- [ ] **4 Fotos vom Auto** machen: Türen zu, ganzes Auto im Bild, Handy auf Hüfthöhe
+  1. schräg vorne links
+  2. genau von der Seite
+  3. schräg hinten rechts
+  4. genau von vorne
+- [ ] In der **Claude-App** mit demselben Konto angemeldet sein wie später am PC.
+
+## Am einfachsten: eine Datei doppelklicken
+
+Lade **`scripts/Roblox-Claude-Einrichten.bat`** herunter (aus dem Chat oder von GitHub) und lege sie auf den Desktop. Ein Doppelklick erledigt die Schritte 3 und 4 unten auf einmal: Claude Code installieren (falls nötig), Projekt laden, Studio verbinden, Verknüpfung „Roblox-Claude Remote“ anlegen.
+
+Windows warnt beim ersten Start evtl. mit „Der Computer wurde durch Windows geschützt“: auf **Weitere Informationen → Trotzdem ausführen** klicken. Die Datei enthält nur die beiden Download-Befehle aus dieser Anleitung.
+
+## Zu Hause am PC (Windows 11)
+
+| # | Schritt | Dauer |
+|---|---|---|
+| 1 | **Roblox Studio** starten. Updates installieren lassen. Ein Spiel öffnen (für den Test: **New → Baseplate**). | 2 min |
+| 2 | In Studio: **Assistant** (Symbol oben rechts) → **…** → **Manage MCP Servers** → **Enable Studio as MCP server** einschalten. Deutsches Studio: Assistenteneinstellungen → **MCP-Server** → **„Studio als MCP-Server aktivieren“**. | 1 min |
+| 3 | **Claude Code installieren**, falls noch nicht vorhanden: Startmenü → „PowerShell“ öffnen → `irm https://claude.ai/install.ps1 \| iex` → danach PowerShell schließen und neu öffnen → `claude` eingeben → im Browser anmelden → mit `/exit` beenden. | 3 min |
+| 4 | **Setup-Skript** in PowerShell ausführen: `irm https://raw.githubusercontent.com/carl147258-cmd/Claude/claude/obby-und-leitfaden/scripts/setup-pc.ps1 \| iex`. Es lädt das Projekt, verbindet Studio und legt die Desktop-Verknüpfung an. | 2 min |
+| 5 | **Fotos auf den PC** in den Ordner `Desktop\Roblox\refs\auto` (bei OneDrive: `C:\Users\<Name>\OneDrive\Desktop\Roblox\refs\auto`) legen, per **Smartphone-Link** (bei Windows 11 dabei), OneDrive, USB-Kabel oder Mail an dich selbst. | 2 min |
+| 6 | **Studio neu starten** und das Spiel wieder öffnen. In „Manage MCP Servers“ sollte bald ein grüner Punkt erscheinen. | 1 min |
+| 7 | Auf dem Desktop **„Roblox-Claude Remote“** doppelklicken. Ein Fenster öffnet sich: Beim ersten Start fragt es „Trust …Roblox-Claude? [y/N]“: `y` + Enter. Claude läuft im Remote-Modus, der PC bleibt wach. **Fenster offen lassen.** | 1 min |
+| 8 | **Test vom Handy:** Claude-App → **Code** → die neue Sitzung antippen → schreiben: *„Prüfe die Verbindung zu Roblox Studio (list_roblox_studios) und mach einen Screenshot.“* Kommt ein Screenshot, ist alles bereit. | 2 min |
+
+**Bevor du gehst:** PC **nicht** herunterfahren, Studio und das Remote-Fenster offen lassen. Bildschirm sperren (Windows-Taste + L) ist in Ordnung.
+
+## Unterwegs weitermachen
+
+In der Claude-App (Code → deine Sitzung) den Auftrag aus `docs/LOKAL-STARTEN.md`, Abschnitt 5, einfügen. Claude arbeitet dann auf deinem PC in Studio und schickt dir Screenshots und Fragen.
+
+## Wenn etwas hakt
+
+| Problem | Lösung |
+|---|---|
+| PowerShell meldet „claude nicht gefunden“ | Schritt 3 wiederholen, PowerShell neu öffnen |
+| Kein grüner Punkt in Studio | Studio und das Remote-Fenster schließen, Studio öffnen, Spiel laden, dann Verknüpfung erneut starten |
+| Sitzung erscheint nicht in der App | Gleiches Konto am PC und in der App? Remote Control braucht eine aktuelle Claude-Code-Version (Setup-Skript bzw. `claude update`). |
+| PC schläft trotzdem ein | Einstellungen → System → Energie → „Bildschirm und Energiesparmodus“ → Energiesparmodus bei Netzbetrieb auf **Nie** |
+| Rote Fehlermeldung im Skript | Text abfotografieren oder kopieren und mir schicken |
