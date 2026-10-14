@@ -27,6 +27,8 @@ export type SwordStyle = {
 	Width: number,
 	Segments: number,
 	Trail: { Color3 }, -- swipe streak / swoosh colours
+	Sparkles: boolean?, -- stars rising from the blade
+	Shimmer: boolean?, -- edge colours cycle through the rainbow (client)
 }
 
 export type Item = {
@@ -39,6 +41,8 @@ export type Item = {
 	Swatch: { Color3 }?,
 	Rarity: string, -- key of Catalog.Rarities
 	CoinBonus: number?, -- swords only: extra coins per point (0.1 = +10 %)
+	RobuxPassId: number?, -- optional: also sold as a game pass (0 = not set up yet)
+	Robux: number?, -- price shown for the game pass
 }
 
 local OBJECT_SCALE = 2.3 -- objects are seen from behind the avatar, ~25 studs away
@@ -224,6 +228,31 @@ Catalog.Swords = {
 			Trail = { rgb(255, 50, 50), rgb(255, 240, 40), rgb(40, 150, 255), rgb(150, 70, 255) },
 		},
 	},
+	{
+		Id = "sternenklinge",
+		Name = "Sternenklinge",
+		Price = 25000,
+		Rarity = "Mythic",
+		CoinBonus = 0.35,
+		-- also sold for Robux as a game pass (create it, then paste the id here)
+		RobuxPassId = 0,
+		Robux = 399,
+		Description = "Geschmiedet aus einer Galaxie.",
+		Style = {
+			Blade = { rgb(40, 22, 115), rgb(70, 30, 150), rgb(28, 40, 130) },
+			BladeMaterial = Enum.Material.Glass,
+			Edge = { rgb(90, 230, 255), rgb(200, 110, 255), rgb(255, 120, 220) },
+			Guard = rgb(225, 230, 255),
+			Wrap = rgb(25, 20, 70),
+			Glow = rgb(170, 110, 255),
+			Curve = 1.2,
+			Width = 0.44,
+			Segments = 10,
+			Trail = { rgb(80, 220, 255), rgb(170, 90, 255), rgb(255, 120, 220) },
+			Sparkles = true,
+			Shimmer = true,
+		},
+	},
 } :: { Item }
 
 Catalog.Sets = {
@@ -383,6 +412,7 @@ Catalog.Rarities = {
 	Rare = { Name = "Selten", Color = rgb(60, 150, 255) },
 	Epic = { Name = "Episch", Color = rgb(180, 80, 255) },
 	Legendary = { Name = "Legendär", Color = rgb(255, 190, 40) },
+	Mythic = { Name = "Mythisch", Color = rgb(255, 70, 200) },
 } :: { [string]: { Name: string, Color: Color3 } }
 
 -- Daily login reward: index = day of the current streak (a missed day restarts at 1).
@@ -398,6 +428,19 @@ Catalog.Robux = {
 		{ ProductId = 0, Coins = 5000, Robux = 199 },
 	},
 }
+
+-- Sword sold as a game pass with this id, if any.
+function Catalog.SwordByPass(passId: number): Item?
+	if passId == 0 then
+		return nil
+	end
+	for _, item in Catalog.Swords do
+		if item.RobuxPassId == passId then
+			return item
+		end
+	end
+	return nil
+end
 
 function Catalog.CoinPackByProduct(productId: number): { ProductId: number, Coins: number, Robux: number }?
 	for _, pack in Catalog.Robux.CoinPacks do

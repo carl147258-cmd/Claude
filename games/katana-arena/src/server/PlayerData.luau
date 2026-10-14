@@ -226,6 +226,22 @@ function PlayerData.Buy(player: Player, category: string, id: string): (boolean,
 	return true, `{item.Name} gekauft!`
 end
 
+-- Gives an item without charging coins (Robux game pass). Equips it when `equip` is set.
+function PlayerData.GrantItem(player: Player, category: string, id: string, equip: boolean)
+	local profile = profiles[player]
+	if not profile or not Catalog.Find(category, id) then
+		return
+	end
+	local isNew = not profile.Owned[category][id]
+	profile.Owned[category][id] = true
+	if equip then
+		profile.Equipped[category] = id
+	end
+	if isNew or equip then
+		changed(player)
+	end
+end
+
 function PlayerData.Equip(player: Player, category: string, id: string): boolean
 	local profile = profiles[player]
 	if not profile or not Catalog.Find(category, id) or not profile.Owned[category][id] then

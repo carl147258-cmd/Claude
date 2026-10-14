@@ -15,7 +15,7 @@ local ObjectBuilder = require(Shared:WaitForChild("ObjectBuilder"))
 local SwordBuilder = require(Shared:WaitForChild("SwordBuilder"))
 local Hud = require(script.Parent:WaitForChild("Hud"))
 
-type Card = { item: Catalog.Item, button: TextButton, frame: Frame }
+type Card = { item: Catalog.Item, button: TextButton, frame: Frame, robux: TextButton? }
 
 local PANEL_COLOR = Color3.fromRGB(25, 8, 18)
 local CARD_COLOR = Color3.fromRGB(45, 20, 35)
@@ -118,6 +118,14 @@ local function refreshCard(category: string, card: Card)
 		card.button.BackgroundColor3 = if coins >= card.item.Price then BUY_COLOR else POOR_COLOR
 		stroke.Thickness = 2
 	end
+	local robux = card.robux
+	if robux then
+		local isOwned = owned[category] and owned[category][id]
+		robux.Visible = not isOwned
+		local ready = (card.item.RobuxPassId or 0) ~= 0
+		robux.Text = if ready then `oder {card.item.Robux} R$` else `oder {card.item.Robux} R$ (bald)`
+		robux.BackgroundColor3 = if ready then Color3.fromRGB(0, 170, 90) else EQUIPPED_COLOR
+	end
 end
 
 local function refresh()
@@ -187,7 +195,26 @@ local function makeCard(category: string, item: Catalog.Item, order: number, pag
 	end)
 
 	frame.Parent = page
-	return { item = item, button = button, frame = frame }
+	-- optional Robux price as a pill over the bottom of the preview
+	local robux: TextButton? = nil
+	if item.Robux then
+		local pill = Hud.Button("", Color3.fromRGB(0, 170, 90))
+		pill.AnchorPoint = Vector2.new(0.5, 0)
+		pill.Position = UDim2.fromScale(0.5, 0.44)
+		pill.Size = UDim2.fromScale(0.6, 0.14)
+		pill.ZIndex = 4
+		pill.Parent = frame
+		pill.Activated:Connect(function()
+			local passId = item.RobuxPassId or 0
+			if passId ~= 0 then
+				MarketplaceService:PromptGamePassPurchase(Players.LocalPlayer, passId)
+			else
+				Hud.Toast("Robux-Kauf ist noch nicht eingerichtet", Color3.fromRGB(255, 120, 120))
+			end
+		end)
+		robux = pill
+	end
+	return { item = item, button = button, frame = frame, robux = robux }
 end
 
 -- Robux offers: the double-coins game pass and coin packs (developer products). The

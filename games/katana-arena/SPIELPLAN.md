@@ -18,7 +18,7 @@ Runde starten → Objekte wegwischen (Bomben meiden) → Punkte = Münzen → im
 - Tempo: schneller Einstieg (erster Kauf nach 2–3 Runden), das teuerste Teil ist ein Langzeitziel (ca. 1,5–3 Stunden). Annahme: ca. 45 Münzen pro Runde, ca. 1.800 pro Stunde.
 - Tägliche Belohnung (7-Tage-Serie): 50 · 75 · 100 · 150 · 200 · 250 · 400 Münzen. Wer einen Tag auslässt, fängt wieder bei Tag 1 an.
 
-**Seltenheitsstufen** (Kartenfarbe im Shop): Gewöhnlich (grau) 100–200 · Selten (blau) 450–700 · Episch (lila) 1.200–2.500 · Legendär (gold) 3.500–5.000
+**Seltenheitsstufen** (Kartenfarbe im Shop): Gewöhnlich (grau) 100–200 · Selten (blau) 450–700 · Episch (lila) 1.200–2.500 · Legendär (gold) 3.500–5.000 · Mythisch (pink) 25.000, zusätzlich mit Robux kaufbar
 
 | Schwert | Stufe | Preis | Münz-Bonus |
 |---|---|---|---|
@@ -29,6 +29,7 @@ Runde starten → Objekte wegwischen (Bomben meiden) → Punkte = Münzen → im
 | Gold-Drachenschwert | Episch | 1.500 | +10 % |
 | Laserschwert | Episch | 2.500 | +15 % |
 | Regenbogen-Klinge | Legendär | 5.000 | +25 % |
+| Sternenklinge (schimmernde Galaxie-Klinge mit Sternen) | Mythisch | 25.000 oder 399 R$ | +35 % |
 
 | Objekt-Set | Stufe | Preis | | Szenerie | Stufe | Preis |
 |---|---|---|---|---|---|---|
@@ -39,7 +40,7 @@ Runde starten → Objekte wegwischen (Bomben meiden) → Punkte = Münzen → im
 | Kuscheltiere | Legendär | 3.500 | | Unterwasser | Episch | 1.800 |
 | | | | | Weltraum | Legendär | 4.500 |
 
-Alles zusammen: 23.920 Münzen (ca. 10–12 Stunden ohne Robux).
+Alles zusammen: 48.920 Münzen (ca. 24 Stunden ohne Robux); ohne die Sternenklinge 23.920.
 
 ## 5. Aussehen & Stimmung
 - Bunter Cartoon-Stil, alles aus Roblox-Teilen gebaut
@@ -50,6 +51,7 @@ Alles zusammen: 23.920 Münzen (ca. 10–12 Stunden ohne Robux).
 | Art | Angebot | Preis |
 |---|---|---|
 | Game Pass (einmalig) | Doppelte Münzen (wirkt mit dem Schwert-Bonus zusammen) | 149 R$ |
+| Game Pass (einmalig) | Sternenklinge (auch für 25.000 Münzen erhältlich) | 399 R$ |
 | Developer Product | 500 Münzen | 25 R$ |
 | Developer Product | 1.500 Münzen | 69 R$ |
 | Developer Product | 5.000 Münzen | 199 R$ |

@@ -62,6 +62,21 @@ local function checkDoubleCoins(player: Player)
 	end
 end
 
+-- Swords sold as game passes: ownership comes from Roblox, so it survives any data loss.
+local function checkSwordPasses(player: Player)
+	for _, item in Catalog.Swords do
+		local passId = item.RobuxPassId
+		if passId and passId ~= 0 then
+			local ok, owns = pcall(function()
+				return MarketplaceService:UserOwnsGamePassAsync(player.UserId, passId)
+			end)
+			if ok and owns and player.Parent then
+				PlayerData.GrantItem(player, "Swords", item.Id, false)
+			end
+		end
+	end
+end
+
 -- Developer products: grant coins exactly once and only after they are saved.
 local function processReceipt(receipt: { [string]: any }): Enum.ProductPurchaseDecision
 	local player = Players:GetPlayerByUserId(receipt.PlayerId)
@@ -143,10 +158,19 @@ function Shop.Start(gameRemote: RemoteEvent)
 	remote = gameRemote
 	MarketplaceService.ProcessReceipt = processReceipt
 	MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passId, purchased)
-		if purchased and passId == Catalog.Robux.DoubleCoins.PassId and passId ~= 0 then
+		if not purchased or passId == 0 then
+			return
+		end
+		if passId == Catalog.Robux.DoubleCoins.PassId then
 			doubleCoins[player] = true
 			remote:FireClient(player, "ShopResult", true, "Doppelte Münzen aktiviert!")
 			sendProfile(player)
+			return
+		end
+		local sword = Catalog.SwordByPass(passId)
+		if sword then
+			PlayerData.GrantItem(player, "Swords", sword.Id, true)
+			remote:FireClient(player, "ShopResult", true, `{sword.Name} freigeschaltet!`)
 		end
 	end)
 	remote.OnServerEvent:Connect(function(player, action: any, category: any, id: any)
@@ -182,6 +206,7 @@ function Shop.Start(gameRemote: RemoteEvent)
 		task.spawn(function()
 			checkDoubleCoins(player)
 			if PlayerData.WaitForProfile(player) then
+				checkSwordPasses(player)
 				local reward, day = PlayerData.ClaimDaily(player)
 				if reward then
 					remote:FireClient(player, "Daily", reward, day)

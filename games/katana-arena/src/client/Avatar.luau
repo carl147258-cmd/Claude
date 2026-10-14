@@ -44,6 +44,8 @@ local hitStopLeft = 0
 local lastBase: Vector3? = nil
 local lastTip: Vector3? = nil
 local defaultTrail = { Color3.fromRGB(170, 60, 255), Color3.fromRGB(255, 35, 70) }
+local shimmerModel: Model? = nil
+local shimmerEdges: { BasePart } = {}
 
 local straightJoints: { Motor6D | AnimationConstraint } = {} -- elbow and wrist, kept straight
 
@@ -216,6 +218,23 @@ function Avatar.Update(dt: number, camera: Camera, cursor: Vector2, active: bool
 		lastTip = nil
 		return
 	end
+	-- Mythic blades: the glowing edge cycles through the colours of a galaxy
+	if model:GetAttribute("Shimmer") then
+		if shimmerModel ~= model then
+			shimmerModel = model
+			table.clear(shimmerEdges)
+			for _, part in model:GetDescendants() do
+				if part:IsA("BasePart") and part.Name == "Edge" then
+					table.insert(shimmerEdges, part)
+				end
+			end
+		end
+		local t = os.clock()
+		for i, edge in shimmerEdges do
+			edge.Color = Color3.fromHSV((0.55 + 0.3 * math.sin(t * 1.5 + i * 0.45)) % 1, 0.65, 1)
+		end
+	end
+
 	-- Roll the blade around the arm so its flat side faces the camera (a katana seen
 	-- edge-on from behind the avatar is just a thin dark line).
 	local grip = handle:FindFirstChild("SwordGrip")

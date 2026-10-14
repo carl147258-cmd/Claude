@@ -19,7 +19,7 @@ Im Menü öffnet **SHOP** den Laden. Gekaufte Sachen werden sofort ausgerüstet.
 - Tägliche Belohnung beim Beitreten: 50 bis 400 Münzen, steigend über eine 7-Tage-Serie.
 - Robux-Reiter: Game Pass „Doppelte Münzen“ (149 R$) und Münzpakete (25 / 69 / 199 R$). Funktioniert erst, wenn die IDs in `Catalog.Robux` eingetragen sind.
 
-- **Schwerter (7):** Blutmond-Katana (gratis), Jade, Eis, Zuckerstange, Gold-Drache, Laser, Regenbogen. Jedes Schwert hat eigene Farben und eine eigene Wischspur.
+- **Schwerter (8):** Blutmond-Katana (gratis), Jade, Eis, Zuckerstange, Gold-Drache, Laser, Regenbogen und die mythische Sternenklinge (25.000 Münzen oder 399 R$). Jedes Schwert hat eigene Farben und eine eigene Wischspur.
 - **Objekt-Sets (5):** Früchte (gratis), Gemüse, Süßigkeiten, Spielzeug, Kuscheltiere. Jedes Set hat eigene Schnitt-Effekte: Saft, Zuckerglitzer oder Watte mit Konfetti.
 - **Szenerien (6):** Blutmond-Nacht (gratis), Kirschblüten-Tempel, Sonnenstrand, Skyline-Stadt, Unterwasser, Weltraum.
 

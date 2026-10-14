@@ -206,6 +206,39 @@ function SwordBuilder.Build(style: Catalog.SwordStyle, scale: number?): Model
 	embers.Acceleration = Vector3.new(0, 2, 0)
 	embers.Parent = midBlade
 
+	if style.Sparkles then
+		-- an invisible box around the blade emits twinkling stars along its whole length
+		-- (the default particle texture is a star sparkle, ideal here)
+		local bladeLength = style.Segments * SEGMENT_LENGTH
+		local zone = part(model, handle, {
+			Name = "SparkleZone",
+			Size = Vector3.new(0.3, bladeLength, style.Width + 0.2),
+			Transparency = 1,
+		}, CFrame.new(0, BLADE_START + bladeLength / 2, 0))
+		local stars = Instance.new("ParticleEmitter")
+		stars.Name = "Stars"
+		stars.Color = ColorSequence.new({
+			ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+			ColorSequenceKeypoint.new(0.5, style.Trail[1]),
+			ColorSequenceKeypoint.new(1, style.Trail[#style.Trail]),
+		})
+		stars.LightEmission = 1
+		stars.Size = NumberSequence.new({
+			NumberSequenceKeypoint.new(0, 0),
+			NumberSequenceKeypoint.new(0.3, 0.28 * buildScale),
+			NumberSequenceKeypoint.new(1, 0),
+		})
+		stars.Lifetime = NumberRange.new(0.6, 1.1)
+		stars.Rate = 30
+		stars.Speed = NumberRange.new(0.2, 0.8)
+		stars.SpreadAngle = Vector2.new(180, 180)
+		stars.RotSpeed = NumberRange.new(-120, 120)
+		stars.Parent = zone
+	end
+	if style.Shimmer then
+		model:SetAttribute("Shimmer", true)
+	end
+
 	return model
 end
 
