@@ -12,7 +12,12 @@ Wie Fruit Ninja, nur in Roblox: Du stehst mit deinem Avatar auf einer schwebende
 
 ## Shop
 
-Im Menü öffnet **SHOP** den Laden. Gekaufte Sachen werden sofort ausgerüstet. Preise und Inhalte stehen in `src/shared/Catalog.luau`.
+Im Menü öffnet **SHOP** den Laden. Gekaufte Sachen werden sofort ausgerüstet. Preise und Inhalte stehen in `src/shared/Catalog.luau`. Die vollständige Preisliste mit Seltenheitsstufen steht in `SPIELPLAN.md` (Abschnitt 4).
+
+- Jeder Gegenstand hat eine Seltenheitsstufe (Gewöhnlich, Selten, Episch, Legendär), die Shop-Karte leuchtet in deren Farbe.
+- Teurere Schwerter geben mehr Münzen pro Punkt (+5 % bis +25 %).
+- Tägliche Belohnung beim Beitreten: 50 bis 400 Münzen, steigend über eine 7-Tage-Serie.
+- Robux-Reiter: Game Pass „Doppelte Münzen“ (149 R$) und Münzpakete (25 / 69 / 199 R$). Funktioniert erst, wenn die IDs in `Catalog.Robux` eingetragen sind.
 
 - **Schwerter (7):** Blutmond-Katana (gratis), Jade, Eis, Zuckerstange, Gold-Drache, Laser, Regenbogen. Jedes Schwert hat eigene Farben und eine eigene Wischspur.
 - **Objekt-Sets (5):** Früchte (gratis), Gemüse, Süßigkeiten, Spielzeug, Kuscheltiere. Jedes Set hat eigene Schnitt-Effekte: Saft, Zuckerglitzer oder Watte mit Konfetti.

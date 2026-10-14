@@ -13,19 +13,33 @@ Runde starten → Objekte wegwischen (Bomben meiden) → Punkte = Münzen → im
 - Alleine spielbar
 
 ## 4. Fortschritt & Belohnungen
-- Gespeichert: Rekord, Münzen, gekaufte und ausgerüstete Gegenstände
-- Münzen: 1 Münze pro Punkt am Ende der Runde
-- Shop (Preise in Münzen, nicht Robux):
+- Gespeichert: Rekord, Münzen, gekaufte und ausgerüstete Gegenstände, Serie der täglichen Belohnung
+- Münzen: 1 Münze pro Punkt am Ende der Runde, plus Bonus des ausgerüsteten Schwerts (gerundet)
+- Tempo: schneller Einstieg (erster Kauf nach 2–3 Runden), das teuerste Teil ist ein Langzeitziel (ca. 1,5–3 Stunden). Annahme: ca. 45 Münzen pro Runde, ca. 1.800 pro Stunde.
+- Tägliche Belohnung (7-Tage-Serie): 50 · 75 · 100 · 150 · 200 · 250 · 400 Münzen. Wer einen Tag auslässt, fängt wieder bei Tag 1 an.
 
-| Schwerter | Preis | Objekt-Sets | Preis | Szenerien | Preis |
-|---|---|---|---|---|---|
-| Blutmond-Katana | gratis | Früchte | gratis | Blutmond-Nacht | gratis |
-| Jade-Klinge | 250 | Gemüse | 300 | Kirschblüten-Tempel | 400 |
-| Eis-Klinge | 600 | Süßigkeiten | 600 | Sonnenstrand | 700 |
-| Zuckerstangen-Schwert | 800 | Spielzeug | 900 | Skyline-Stadt | 1000 |
-| Gold-Drachenschwert | 1200 | Kuscheltiere | 1500 | Unterwasser | 1500 |
-| Laserschwert | 2500 | | | Weltraum | 2500 |
-| Regenbogen-Klinge | 5000 | | | | |
+**Seltenheitsstufen** (Kartenfarbe im Shop): Gewöhnlich (grau) 100–200 · Selten (blau) 450–700 · Episch (lila) 1.200–2.500 · Legendär (gold) 3.500–5.000
+
+| Schwert | Stufe | Preis | Münz-Bonus |
+|---|---|---|---|
+| Blutmond-Katana | Gewöhnlich | gratis | – |
+| Jade-Klinge | Gewöhnlich | 120 | – |
+| Zuckerstangen-Schwert | Selten | 450 | +5 % |
+| Eis-Klinge | Selten | 700 | +5 % |
+| Gold-Drachenschwert | Episch | 1.500 | +10 % |
+| Laserschwert | Episch | 2.500 | +15 % |
+| Regenbogen-Klinge | Legendär | 5.000 | +25 % |
+
+| Objekt-Set | Stufe | Preis | | Szenerie | Stufe | Preis |
+|---|---|---|---|---|---|---|
+| Früchte | Gewöhnlich | gratis | | Blutmond-Nacht | Gewöhnlich | gratis |
+| Gemüse | Gewöhnlich | 150 | | Kirschblüten-Tempel | Gewöhnlich | 200 |
+| Süßigkeiten | Selten | 600 | | Sonnenstrand | Selten | 500 |
+| Spielzeug | Episch | 1.200 | | Skyline-Stadt | Episch | 1.200 |
+| Kuscheltiere | Legendär | 3.500 | | Unterwasser | Episch | 1.800 |
+| | | | | Weltraum | Legendär | 4.500 |
+
+Alles zusammen: 23.920 Münzen (ca. 10–12 Stunden ohne Robux).
 
 ## 5. Aussehen & Stimmung
 - Bunter Cartoon-Stil, alles aus Roblox-Teilen gebaut
@@ -33,7 +47,14 @@ Runde starten → Objekte wegwischen (Bomben meiden) → Punkte = Münzen → im
 - Sounds: Schwusch, Schnitt, Splatsch, Kombo, Bombe
 
 ## 6. Geld (Robux)
-Vorerst keine Robux-Käufe. Später möglich: Game Pass „doppelte Münzen“. Das entscheidest du.
+| Art | Angebot | Preis |
+|---|---|---|
+| Game Pass (einmalig) | Doppelte Münzen (wirkt mit dem Schwert-Bonus zusammen) | 149 R$ |
+| Developer Product | 500 Münzen | 25 R$ |
+| Developer Product | 1.500 Münzen | 69 R$ |
+| Developer Product | 5.000 Münzen | 199 R$ |
+
+Die IDs werden nach dem Anlegen im Creator Dashboard in `src/shared/Catalog.luau` (`Catalog.Robux`) eingetragen. Bis dahin zeigt der Shop „Bald verfügbar“. Keine bezahlten Zufallsboxen, kein Vorteil gegen andere Spieler.
 
 ## 7. Budget in echtem Geld
 Keins nötig.
@@ -53,4 +74,4 @@ Keins nötig.
 Name, Preise, Robux-Angebote, Veröffentlichung.
 
 ## 10. Offene Fragen / Notizen
-- Preise sind Startwerte und lassen sich in `src/shared/Catalog.luau` ändern.
+- Preise sind Startwerte und lassen sich in `src/shared/Catalog.luau` ändern. Nach den ersten echten Spielern prüfen, wie viele Münzen eine Runde wirklich bringt.

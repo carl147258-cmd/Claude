@@ -258,10 +258,14 @@ remote.OnClientEvent:Connect(function(action: string, ...)
 			"NOCHMAL"
 		)
 	elseif action == "Profile" then
-		local coins, owned, equipped = ...
+		local coins, owned, equipped, doubleCoins = ...
 		Hud.SetCoins(coins)
-		Shop.SetProfile(coins, owned, equipped)
+		Shop.SetProfile(coins, owned, equipped, doubleCoins)
 		Scenery.Apply(equipped.Scenes)
+	elseif action == "Daily" then
+		local reward, day = ...
+		Hud.Toast(`Tägliche Belohnung (Tag {day}/7): +{reward} Münzen`, Config.CoinColor)
+		Sfx.Play("Combo")
 	elseif action == "ShopResult" then
 		local ok, message = ...
 		Hud.Toast(message, if ok then Config.CoinColor else Color3.fromRGB(255, 120, 120))

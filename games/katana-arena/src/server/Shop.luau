@@ -1,8 +1,10 @@
 --!strict
 -- ServerScriptService/Server/Shop (ModuleScript)
 -- Handles "Buy" / "Equip" requests (validated against Catalog and the player's coins),
--- sends the profile to the client and puts the equipped sword into the avatar's hand.
+-- Robux offers (game pass + coin packs via ProcessReceipt), the daily reward, sends the
+-- profile to the client and puts the equipped sword into the avatar's hand.
 
+local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -17,14 +19,64 @@ local SWORD_SCALE = 1.25 -- seen from ~12 studs behind the avatar, so chunkier t
 
 local remote: RemoteEvent
 local lastRequest: { [Player]: number } = {}
+local doubleCoins: { [Player]: boolean } = {}
 
 local Shop = {}
 
 local function sendProfile(player: Player)
 	local profile = PlayerData.GetProfile(player)
 	if profile and player.Parent then
-		remote:FireClient(player, "Profile", profile.Coins, profile.Owned, profile.Equipped)
+		remote:FireClient(
+			player,
+			"Profile",
+			profile.Coins,
+			profile.Owned,
+			profile.Equipped,
+			doubleCoins[player] == true,
+			profile.DailyStreak
+		)
 	end
+end
+
+-- Coins per point for this player: equipped sword bonus, doubled with the game pass.
+function Shop.CoinMultiplier(player: Player): number
+	local sword = Catalog.Find("Swords", PlayerData.GetEquipped(player, "Swords"))
+	local multiplier = Config.CoinsPerPoint * (1 + (sword and sword.CoinBonus or 0))
+	if doubleCoins[player] then
+		multiplier *= 2
+	end
+	return multiplier
+end
+
+local function checkDoubleCoins(player: Player)
+	local passId = Catalog.Robux.DoubleCoins.PassId
+	if passId == 0 then
+		return
+	end
+	local ok, owns = pcall(function()
+		return MarketplaceService:UserOwnsGamePassAsync(player.UserId, passId)
+	end)
+	if ok and owns and player.Parent then
+		doubleCoins[player] = true
+		sendProfile(player)
+	end
+end
+
+-- Developer products: grant coins exactly once and only after they are saved.
+local function processReceipt(receipt: { [string]: any }): Enum.ProductPurchaseDecision
+	local player = Players:GetPlayerByUserId(receipt.PlayerId)
+	local pack = Catalog.CoinPackByProduct(receipt.ProductId)
+	if not player or not pack then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+	if not PlayerData.WaitForProfile(player) then
+		return Enum.ProductPurchaseDecision.NotProcessedYet
+	end
+	if PlayerData.GrantPurchase(player, receipt.PurchaseId, pack.Coins) then
+		remote:FireClient(player, "ShopResult", true, `+{pack.Coins} Münzen gekauft!`)
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+	return Enum.ProductPurchaseDecision.NotProcessedYet
 end
 
 -- Builds the equipped sword and welds it to the right hand (R15) or right arm (R6).
@@ -89,6 +141,14 @@ end
 
 function Shop.Start(gameRemote: RemoteEvent)
 	remote = gameRemote
+	MarketplaceService.ProcessReceipt = processReceipt
+	MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(player, passId, purchased)
+		if purchased and passId == Catalog.Robux.DoubleCoins.PassId and passId ~= 0 then
+			doubleCoins[player] = true
+			remote:FireClient(player, "ShopResult", true, "Doppelte Münzen aktiviert!")
+			sendProfile(player)
+		end
+	end)
 	remote.OnServerEvent:Connect(function(player, action: any, category: any, id: any)
 		if action == "Buy" or action == "Equip" then
 			onRequest(player, action, category, id)
@@ -119,6 +179,15 @@ function Shop.Start(gameRemote: RemoteEvent)
 				end
 			end)
 		end
+		task.spawn(function()
+			checkDoubleCoins(player)
+			if PlayerData.WaitForProfile(player) then
+				local reward, day = PlayerData.ClaimDaily(player)
+				if reward then
+					remote:FireClient(player, "Daily", reward, day)
+				end
+			end
+		end)
 		player.CharacterAdded:Connect(function(character)
 			character:WaitForChild("Humanoid")
 			character:WaitForChild("RightHand", 5)
@@ -136,6 +205,7 @@ function Shop.Start(gameRemote: RemoteEvent)
 	Players.PlayerRemoving:Connect(function(player)
 		lastRequest[player] = nil
 		equippedSword[player] = nil
+		doubleCoins[player] = nil
 	end)
 end
 

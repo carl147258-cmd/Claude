@@ -37,6 +37,8 @@ export type Item = {
 	Style: SwordStyle?,
 	Kinds: { ObjectKind }?,
 	Swatch: { Color3 }?,
+	Rarity: string, -- key of Catalog.Rarities
+	CoinBonus: number?, -- swords only: extra coins per point (0.1 = +10 %)
 }
 
 local OBJECT_SCALE = 2.3 -- objects are seen from behind the avatar, ~25 studs away
@@ -80,6 +82,7 @@ Catalog.Swords = {
 		Id = "blutmond",
 		Name = "Blutmond-Katana",
 		Price = 0,
+		Rarity = "Common",
 		Description = "Dein erstes Katana.",
 		Style = {
 			Blade = { rgb(30, 30, 36) },
@@ -97,7 +100,8 @@ Catalog.Swords = {
 	{
 		Id = "jade",
 		Name = "Jade-Klinge",
-		Price = 250,
+		Price = 120,
+		Rarity = "Common",
 		Description = "Grün wie ein Bambuswald.",
 		Style = {
 			Blade = { rgb(40, 120, 80) },
@@ -115,7 +119,9 @@ Catalog.Swords = {
 	{
 		Id = "eis",
 		Name = "Eis-Klinge",
-		Price = 600,
+		Price = 700,
+		Rarity = "Rare",
+		CoinBonus = 0.05,
 		Description = "Eiskalt und messerscharf.",
 		Style = {
 			Blade = { rgb(170, 225, 255) },
@@ -133,7 +139,9 @@ Catalog.Swords = {
 	{
 		Id = "zuckerstange",
 		Name = "Zuckerstangen-Schwert",
-		Price = 800,
+		Price = 450,
+		Rarity = "Rare",
+		CoinBonus = 0.05,
 		Description = "Süß gestreift.",
 		Style = {
 			Blade = { rgb(240, 40, 50), rgb(250, 250, 250) },
@@ -151,7 +159,9 @@ Catalog.Swords = {
 	{
 		Id = "golddrache",
 		Name = "Gold-Drachenschwert",
-		Price = 1200,
+		Price = 1500,
+		Rarity = "Epic",
+		CoinBonus = 0.1,
 		Description = "Breite Klinge, feuriges Glühen.",
 		Style = {
 			Blade = { rgb(230, 175, 50) },
@@ -170,6 +180,8 @@ Catalog.Swords = {
 		Id = "laser",
 		Name = "Laserschwert",
 		Price = 2500,
+		Rarity = "Epic",
+		CoinBonus = 0.15,
 		Description = "Reines Licht.",
 		Style = {
 			Blade = { rgb(80, 230, 255) },
@@ -189,6 +201,8 @@ Catalog.Swords = {
 		Id = "regenbogen",
 		Name = "Regenbogen-Klinge",
 		Price = 5000,
+		Rarity = "Legendary",
+		CoinBonus = 0.25,
 		Description = "Die Legende.",
 		Style = {
 			Blade = { rgb(245, 245, 255) },
@@ -217,6 +231,7 @@ Catalog.Sets = {
 		Id = "fruechte",
 		Name = "Früchte",
 		Price = 0,
+		Rarity = "Common",
 		Description = "Melone, Orange, Apfel und mehr.",
 		Kinds = {
 			kind("Melone", "Melon", 1.45, rgb(52, 150, 60), rgb(245, 60, 80), 1),
@@ -230,7 +245,8 @@ Catalog.Sets = {
 	{
 		Id = "gemuese",
 		Name = "Gemüse",
-		Price = 300,
+		Price = 150,
+		Rarity = "Common",
 		Description = "Tomate, Kürbis, Aubergine ...",
 		Kinds = {
 			kind("Tomate", "Tomato", 0.95, rgb(225, 35, 30), rgb(255, 90, 70), 1),
@@ -244,6 +260,7 @@ Catalog.Sets = {
 		Id = "suessigkeiten",
 		Name = "Süßigkeiten",
 		Price = 600,
+		Rarity = "Rare",
 		Description = "Donut, Cupcake, Lolli ...",
 		Kinds = {
 			kind("Donut", "Donut", 1.1, rgb(215, 160, 95), rgb(255, 230, 190), 1, { Burst = "Sparkle" }),
@@ -256,7 +273,8 @@ Catalog.Sets = {
 	{
 		Id = "spielzeug",
 		Name = "Spielzeug",
-		Price = 900,
+		Price = 1200,
+		Rarity = "Epic",
 		Description = "Wasserball, Würfel, Zauberwürfel ...",
 		Kinds = {
 			kind("Wasserball", "BeachBall", 1.2, rgb(240, 240, 240), rgb(250, 250, 250), 1, { Burst = "Sparkle" }),
@@ -293,7 +311,8 @@ Catalog.Sets = {
 	{
 		Id = "kuscheltiere",
 		Name = "Kuscheltiere",
-		Price = 1500,
+		Price = 3500,
+		Rarity = "Legendary",
 		Description = "Teddy, Hase, Ente, Pinguin, Einhorn.",
 		Kinds = {
 			kind("Teddy", "Teddy", 1.15, rgb(160, 105, 60), rgb(250, 248, 240), 1, { Burst = "Fluff" }),
@@ -310,47 +329,84 @@ Catalog.Scenes = {
 		Id = "blutmond",
 		Name = "Blutmond-Nacht",
 		Price = 0,
+		Rarity = "Common",
 		Description = "Roter Mond über den Gipfeln.",
 		Swatch = { rgb(255, 70, 60), rgb(40, 15, 40) },
 	},
 	{
 		Id = "kirschbluete",
 		Name = "Kirschblüten-Tempel",
-		Price = 400,
+		Price = 200,
+		Rarity = "Common",
 		Description = "Rosa Bäume, Pagode und Teich.",
 		Swatch = { rgb(255, 180, 210), rgb(120, 190, 255) },
 	},
 	{
 		Id = "strand",
 		Name = "Sonnenstrand",
-		Price = 700,
+		Price = 500,
+		Rarity = "Rare",
 		Description = "Meer, Palmen und Sonne.",
 		Swatch = { rgb(255, 220, 120), rgb(40, 170, 230) },
 	},
 	{
 		Id = "skyline",
 		Name = "Skyline-Stadt",
-		Price = 1000,
+		Price = 1200,
+		Rarity = "Epic",
 		Description = "Neonlichter einer Großstadt.",
 		Swatch = { rgb(255, 60, 200), rgb(20, 20, 60) },
 	},
 	{
 		Id = "unterwasser",
 		Name = "Unterwasser",
-		Price = 1500,
+		Price = 1800,
+		Rarity = "Epic",
 		Description = "Korallen, Fische und Blasen.",
 		Swatch = { rgb(60, 220, 230), rgb(10, 50, 120) },
 	},
 	{
 		Id = "weltraum",
 		Name = "Weltraum",
-		Price = 2500,
+		Price = 4500,
+		Rarity = "Legendary",
 		Description = "Planeten und Sterne.",
 		Swatch = { rgb(170, 90, 255), rgb(5, 5, 20) },
 	},
 } :: { Item }
 
 Catalog.Defaults = { Swords = "blutmond", Sets = "fruechte", Scenes = "blutmond" }
+
+-- Rarity tiers: shop cards glow in the tier colour.
+Catalog.Rarities = {
+	Common = { Name = "Gewöhnlich", Color = rgb(170, 170, 180) },
+	Rare = { Name = "Selten", Color = rgb(60, 150, 255) },
+	Epic = { Name = "Episch", Color = rgb(180, 80, 255) },
+	Legendary = { Name = "Legendär", Color = rgb(255, 190, 40) },
+} :: { [string]: { Name: string, Color: Color3 } }
+
+-- Daily login reward: index = day of the current streak (a missed day restarts at 1).
+Catalog.DailyRewards = { 50, 75, 100, 150, 200, 250, 400 }
+
+-- Robux offers. Create them in the Creator Dashboard (Monetization) and paste the ids
+-- here; an id of 0 keeps the offer greyed out in the shop.
+Catalog.Robux = {
+	DoubleCoins = { PassId = 0, Robux = 149, Name = "Doppelte Münzen" },
+	CoinPacks = {
+		{ ProductId = 0, Coins = 500, Robux = 25 },
+		{ ProductId = 0, Coins = 1500, Robux = 69 },
+		{ ProductId = 0, Coins = 5000, Robux = 199 },
+	},
+}
+
+function Catalog.CoinPackByProduct(productId: number): { ProductId: number, Coins: number, Robux: number }?
+	for _, pack in Catalog.Robux.CoinPacks do
+		if pack.ProductId ~= 0 and pack.ProductId == productId then
+			return pack
+		end
+	end
+	return nil
+end
 
 Catalog.Bomb = kind("Bombe", "Bomb", 1.0, rgb(25, 25, 30), rgb(255, 120, 0), 0, { IsBomb = true })
 

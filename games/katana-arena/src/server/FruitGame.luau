@@ -11,6 +11,7 @@ local Catalog = require(Shared:WaitForChild("Catalog"))
 local Config = require(Shared:WaitForChild("Config"))
 local Arena = require(script.Parent.Arena)
 local PlayerData = require(script.Parent.PlayerData)
+local Shop = require(script.Parent.Shop)
 
 type Fruit = {
 	kind: number,
@@ -70,7 +71,8 @@ local function endRound(player: Player, session: Session)
 	table.clear(session.fruits)
 	local oldBest = PlayerData.GetBest(player)
 	PlayerData.SetScore(player, session.score)
-	local coins = session.score * Config.CoinsPerPoint
+	-- sword bonus and the double-coins pass apply here; rounded so small bonuses still count
+	local coins = math.round(session.score * Shop.CoinMultiplier(player))
 	PlayerData.AddCoins(player, coins)
 	remote:FireClient(player, "GameOver", session.score, PlayerData.GetBest(player), session.score > oldBest, coins)
 	task.spawn(PlayerData.Save, player)

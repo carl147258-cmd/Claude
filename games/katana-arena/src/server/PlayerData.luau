@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local Catalog = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Catalog"))
 
 local STORE_NAME = "KatanaFruits_v1"
-local DATA_VERSION = 2
+local DATA_VERSION = 3
 local MAX_RETRIES = if RunService:IsStudio() then 1 else 5
 local AUTOSAVE_SECONDS = 120
 
@@ -29,6 +29,9 @@ export type Profile = {
 	Coins: number,
 	Owned: { [string]: { [string]: boolean } },
 	Equipped: { [string]: string },
+	DailyDay: number, -- UTC day number of the last daily reward
+	DailyStreak: number, -- 1..#Catalog.DailyRewards
+	Purchases: { string }, -- recent Robux purchase ids (ProcessReceipt idempotency)
 }
 
 local profiles: { [Player]: Profile } = {}
@@ -73,6 +76,9 @@ local function reconcile(stored: any): Profile
 		Coins = if typeof(data.Coins) == "number" then math.max(0, math.floor(data.Coins)) else 0,
 		Owned = {},
 		Equipped = {},
+		DailyDay = if typeof(data.DailyDay) == "number" then data.DailyDay else 0,
+		DailyStreak = if typeof(data.DailyStreak) == "number" then data.DailyStreak else 0,
+		Purchases = {},
 	}
 	for _, category in Catalog.Categories do
 		local owned = {}
@@ -89,6 +95,13 @@ local function reconcile(stored: any): Profile
 		profile.Owned[category] = owned
 		local equipped = if typeof(data.Equipped) == "table" then data.Equipped[category] else nil
 		profile.Equipped[category] = if typeof(equipped) == "string" and owned[equipped] then equipped else default
+	end
+	if typeof(data.Purchases) == "table" then
+		for _, id in data.Purchases do
+			if typeof(id) == "string" then
+				table.insert(profile.Purchases, id)
+			end
+		end
 	end
 	return profile
 end
@@ -108,6 +121,9 @@ local function serialise(profile: Profile): { [string]: any }
 		Coins = profile.Coins,
 		Owned = owned,
 		Equipped = table.clone(profile.Equipped),
+		DailyDay = profile.DailyDay,
+		DailyStreak = profile.DailyStreak,
+		Purchases = table.clone(profile.Purchases),
 	}
 end
 
@@ -222,10 +238,14 @@ function PlayerData.Equip(player: Player, category: string, id: string): boolean
 	return true
 end
 
-function PlayerData.Save(player: Player)
+-- Returns true when the profile is safely stored (or nothing needed saving).
+function PlayerData.Save(player: Player): boolean
 	local profile = profiles[player]
-	if not profile or not canSave[player] or not dirty[player] then
-		return
+	if not profile or not canSave[player] then
+		return false
+	end
+	if not dirty[player] then
+		return true
 	end
 	local snapshot = serialise(profile)
 	local ok = withRetries(function()
@@ -239,6 +259,56 @@ function PlayerData.Save(player: Player)
 	if ok then
 		dirty[player] = nil
 	end
+	return ok
+end
+
+-- Daily login reward. Returns the coins given and the streak day, or nil if already
+-- claimed today (UTC). A missed day restarts the streak at day 1.
+function PlayerData.ClaimDaily(player: Player): (number?, number?)
+	local profile = profiles[player]
+	if not profile then
+		return nil, nil
+	end
+	local today = math.floor(os.time() / 86400)
+	if profile.DailyDay == today then
+		return nil, nil
+	end
+	local streak = if profile.DailyDay == today - 1 then profile.DailyStreak % #Catalog.DailyRewards + 1 else 1
+	local reward = Catalog.DailyRewards[streak]
+	profile.DailyDay = today
+	profile.DailyStreak = streak
+	profile.Coins += reward
+	changed(player)
+	return reward, streak
+end
+
+-- Robux coin pack. Idempotent per purchase id; only reports success once the coins are
+-- saved, so ProcessReceipt can return PurchaseGranted safely (and retry otherwise).
+function PlayerData.GrantPurchase(player: Player, purchaseId: string, coins: number): boolean
+	local profile = profiles[player]
+	if not profile or not canSave[player] then
+		return false
+	end
+	if table.find(profile.Purchases, purchaseId) then
+		return true
+	end
+	profile.Coins += coins
+	table.insert(profile.Purchases, purchaseId)
+	while #profile.Purchases > 50 do
+		table.remove(profile.Purchases, 1)
+	end
+	dirty[player] = true
+	if PlayerData.Save(player) then
+		changed(player)
+		return true
+	end
+	-- not stored: undo, Roblox will call ProcessReceipt again later
+	profile.Coins -= coins
+	local index = table.find(profile.Purchases, purchaseId)
+	if index then
+		table.remove(profile.Purchases, index)
+	end
+	return false
 end
 
 function PlayerData.Start()

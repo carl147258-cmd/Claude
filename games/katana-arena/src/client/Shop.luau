@@ -1,8 +1,11 @@
 --!strict
 -- StarterPlayerScripts/Client/Shop (ModuleScript)
--- Shop window: tabs for swords, object sets and scenes, a card per item with a 3D preview,
--- price or equip button. It only sends intents ("Buy" / "Equip"); the server decides.
+-- Shop window: tabs for swords, object sets, scenes and Robux offers; a card per item with
+-- a 3D preview, rarity colour and price or equip button. It only sends intents ("Buy" /
+-- "Equip", Robux prompts); the server decides and grants.
 
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -32,6 +35,8 @@ local cards: { [string]: { Card } } = {}
 local coins = 0
 local owned: { [string]: { [string]: boolean } } = {}
 local equipped: { [string]: string } = {}
+local hasDoubleCoins = false
+local robuxRefresh: { () -> () } = {}
 
 local function corner(parent: Instance, radius: number)
 	local c = Instance.new("UICorner")
@@ -98,42 +103,63 @@ end
 local function refreshCard(category: string, card: Card)
 	local id = card.item.Id
 	local stroke = card.frame:FindFirstChildOfClass("UIStroke") :: UIStroke
+	local rarity = Catalog.Rarities[card.item.Rarity] or Catalog.Rarities.Common
+	stroke.Color = rarity.Color
 	if equipped[category] == id then
 		card.button.Text = "AUSGERÜSTET"
 		card.button.BackgroundColor3 = EQUIPPED_COLOR
-		stroke.Color = Config.CoinColor
-		stroke.Thickness = 3
+		stroke.Thickness = 4
 	elseif owned[category] and owned[category][id] then
 		card.button.Text = "AUSRÜSTEN"
 		card.button.BackgroundColor3 = OWNED_COLOR
-		stroke.Color = Color3.fromRGB(90, 60, 80)
-		stroke.Thickness = 1.5
+		stroke.Thickness = 2
 	else
 		card.button.Text = `{card.item.Price} Münzen`
 		card.button.BackgroundColor3 = if coins >= card.item.Price then BUY_COLOR else POOR_COLOR
-		stroke.Color = Color3.fromRGB(90, 60, 80)
-		stroke.Thickness = 1.5
+		stroke.Thickness = 2
 	end
 end
 
 local function refresh()
-	coinLabel.Text = `Münzen: {coins}`
+	coinLabel.Text = if hasDoubleCoins then `Münzen: {coins}  (x2)` else `Münzen: {coins}`
 	for category, list in cards do
 		for _, card in list do
 			refreshCard(category, card)
 		end
 	end
+	for _, update in robuxRefresh do
+		update()
+	end
+end
+
+-- Small coloured tag in a card corner (rarity, coin bonus).
+local function tag(parent: Frame, text: string, color: Color3, right: boolean)
+	local l = Hud.Label({
+		Text = text,
+		AnchorPoint = Vector2.new(if right then 1 else 0, 0),
+		Position = UDim2.new(if right then 1 else 0, if right then -8 else 8, 0, 6),
+		Size = UDim2.new(0.45, 0, 0, 18),
+		TextXAlignment = if right then Enum.TextXAlignment.Right else Enum.TextXAlignment.Left,
+		TextColor3 = color,
+		ZIndex = 3,
+	})
+	l.Parent = parent
 end
 
 local function makeCard(category: string, item: Catalog.Item, order: number, page: ScrollingFrame): Card
 	local frame = Instance.new("Frame")
-	frame.LayoutOrder = order
+	frame.LayoutOrder = item.Price * 100 + order -- cheapest first
 	frame.BackgroundColor3 = CARD_COLOR
 	corner(frame, 12)
 	local stroke = Instance.new("UIStroke")
 	stroke.Parent = frame
 
 	previewFor(category, item, frame)
+	local rarity = Catalog.Rarities[item.Rarity] or Catalog.Rarities.Common
+	tag(frame, rarity.Name, rarity.Color, false)
+	if item.CoinBonus then
+		tag(frame, `+{math.round(item.CoinBonus * 100)} % Münzen`, Config.CoinColor, true)
+	end
 
 	local name = Hud.Label({
 		Text = item.Name,
@@ -162,6 +188,82 @@ local function makeCard(category: string, item: Catalog.Item, order: number, pag
 
 	frame.Parent = page
 	return { item = item, button = button, frame = frame }
+end
+
+-- Robux offers: the double-coins game pass and coin packs (developer products). The
+-- purchase prompts come from Roblox; the server grants coins in ProcessReceipt.
+local function robuxCard(page: ScrollingFrame, order: number, headline: string, name: string): (Frame, TextButton)
+	local frame = Instance.new("Frame")
+	frame.LayoutOrder = order
+	frame.BackgroundColor3 = CARD_COLOR
+	corner(frame, 12)
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Catalog.Rarities.Legendary.Color
+	stroke.Thickness = 2
+	stroke.Parent = frame
+	local icon = Hud.CoinIcon(52)
+	icon.AnchorPoint = Vector2.new(0.5, 0)
+	icon.Position = UDim2.new(0.5, 0, 0, 14)
+	icon.Parent = frame
+	local big = Hud.Label({
+		Text = headline,
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0, 72),
+		Size = UDim2.new(0.9, 0, 0, 40),
+		TextColor3 = Config.CoinColor,
+	})
+	big.Parent = frame
+	local label = Hud.Label({
+		Text = name,
+		Position = UDim2.fromScale(0.05, 0.6),
+		Size = UDim2.fromScale(0.9, 0.14),
+	})
+	label.Parent = frame
+	local button = Hud.Button("", Color3.fromRGB(0, 170, 90))
+	button.AnchorPoint = Vector2.new(0.5, 1)
+	button.Position = UDim2.fromScale(0.5, 0.96)
+	button.Size = UDim2.fromScale(0.86, 0.18)
+	button.Parent = frame
+	frame.Parent = page
+	return frame, button
+end
+
+local function setRobuxButton(button: TextButton, id: number, robux: number, active: boolean)
+	if active then
+		button.Text = "AKTIV"
+		button.BackgroundColor3 = EQUIPPED_COLOR
+	elseif id == 0 then
+		button.Text = "Bald verfügbar"
+		button.BackgroundColor3 = EQUIPPED_COLOR
+	else
+		button.Text = `{robux} R$`
+		button.BackgroundColor3 = Color3.fromRGB(0, 170, 90)
+	end
+end
+
+local function buildRobuxPage(page: ScrollingFrame)
+	local player = Players.LocalPlayer
+	local pass = Catalog.Robux.DoubleCoins
+	local _, passButton = robuxCard(page, 0, "x2", pass.Name)
+	passButton.Activated:Connect(function()
+		if pass.PassId ~= 0 and not hasDoubleCoins then
+			MarketplaceService:PromptGamePassPurchase(player, pass.PassId)
+		end
+	end)
+	table.insert(robuxRefresh, function()
+		setRobuxButton(passButton, pass.PassId, pass.Robux, hasDoubleCoins)
+	end)
+	for i, pack in Catalog.Robux.CoinPacks do
+		local _, button = robuxCard(page, i, `+{pack.Coins}`, "Münzpaket")
+		button.Activated:Connect(function()
+			if pack.ProductId ~= 0 then
+				MarketplaceService:PromptProductPurchase(player, pack.ProductId)
+			end
+		end)
+		table.insert(robuxRefresh, function()
+			setRobuxButton(button, pack.ProductId, pack.Robux, false)
+		end)
+	end
 end
 
 local function showTab(category: string)
@@ -217,10 +319,12 @@ function Shop.Init(gameRemote: RemoteEvent)
 	close.Parent = panel
 	close.Activated:Connect(Shop.Close)
 
-	for i, category in Catalog.Categories do
-		local tab = Hud.Button((Catalog.CategoryNames :: any)[category], CARD_COLOR)
-		tab.Position = UDim2.new((i - 1) / 3, if i == 1 then 16 else 6, 0, 64)
-		tab.Size = UDim2.new(1 / 3, -22, 0, 44)
+	local tabNames = table.clone(Catalog.Categories)
+	table.insert(tabNames, "Robux")
+	for i, category in tabNames do
+		local tab = Hud.Button((Catalog.CategoryNames :: any)[category] or "Robux", CARD_COLOR)
+		tab.Position = UDim2.new((i - 1) / #tabNames, if i == 1 then 16 else 6, 0, 64)
+		tab.Size = UDim2.new(1 / #tabNames, -22, 0, 44)
 		tab.Parent = panel
 		tab.Activated:Connect(function()
 			showTab(category)
@@ -245,9 +349,13 @@ function Shop.Init(gameRemote: RemoteEvent)
 		page.Parent = panel
 		pages[category] = page
 
-		cards[category] = {}
-		for order, item in (Catalog :: any)[category] :: { Catalog.Item } do
-			table.insert(cards[category], makeCard(category, item, order, page))
+		if category == "Robux" then
+			buildRobuxPage(page)
+		else
+			cards[category] = {}
+			for order, item in (Catalog :: any)[category] :: { Catalog.Item } do
+				table.insert(cards[category], makeCard(category, item, order, page))
+			end
 		end
 	end
 	showTab("Swords")
@@ -255,10 +363,11 @@ function Shop.Init(gameRemote: RemoteEvent)
 	refresh()
 end
 
-function Shop.SetProfile(newCoins: number, newOwned: any, newEquipped: any)
+function Shop.SetProfile(newCoins: number, newOwned: any, newEquipped: any, doubleCoins: boolean?)
 	coins = newCoins
 	owned = newOwned
 	equipped = newEquipped
+	hasDoubleCoins = doubleCoins == true
 	refresh()
 end
 
