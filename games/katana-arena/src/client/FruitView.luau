@@ -23,6 +23,7 @@ type Fruit = {
 	spinAxis: Vector3,
 	spinSpeed: number,
 	shine: BasePart?,
+	trailAnchor: BasePart,
 }
 
 local FruitView = {}
@@ -78,6 +79,35 @@ function FruitView.Add(id: number, setId: string, kindId: number, p0: Vector3, v
 		part.Parent = model
 		shine = part
 	end
+	-- Cartoon outline so objects read clearly against every scene
+	if not kind.IsBomb then
+		local outline = Instance.new("Highlight")
+		outline.FillTransparency = 1
+		outline.OutlineColor = kind.Skin:Lerp(Color3.new(0, 0, 0), 0.65)
+		outline.OutlineTransparency = 0.05
+		outline.DepthMode = Enum.HighlightDepthMode.Occluded
+		outline.Parent = model
+	end
+	-- Short motion trail in the object's colour (on a non-spinning anchor)
+	local anchor = newPart({ Name = "TrailAnchor", Transparency = 1, Size = Vector3.one * 0.2 })
+	local top = Instance.new("Attachment")
+	top.Position = Vector3.new(0, kind.Radius * 0.22, 0) -- narrow: a wide trail washes over the object
+	top.Parent = anchor
+	local bottom = Instance.new("Attachment")
+	bottom.Position = Vector3.new(0, -kind.Radius * 0.22, 0)
+	bottom.Parent = anchor
+	local trail = Instance.new("Trail")
+	trail.Attachment0 = top
+	trail.Attachment1 = bottom
+	trail.FaceCamera = true
+	trail.Lifetime = 0.22
+	trail.LightEmission = 0.25
+	trail.Color = ColorSequence.new(kind.Skin)
+	trail.Transparency = NumberSequence.new(0.6, 1)
+	trail.WidthScale = NumberSequence.new(1, 0.1)
+	trail.Parent = anchor
+	anchor.CFrame = CFrame.new(p0)
+	anchor.Parent = model
 	fruits[id] = {
 		kind = kind,
 		kindId = kindId,
@@ -90,6 +120,7 @@ function FruitView.Add(id: number, setId: string, kindId: number, p0: Vector3, v
 		-- plush animals tumble slowly so their faces stay readable
 		spinSpeed = if kind.Burst == "Fluff" then rng:NextNumber(1, 2.5) else rng:NextNumber(2, 6),
 		shine = shine,
+		trailAnchor = anchor,
 	}
 end
 
@@ -103,6 +134,7 @@ function FruitView.Update(cameraCFrame: CFrame)
 		else
 			local pos = Config.FruitPosition(fruit.p0, fruit.v0, fruit.g, math.max(age, 0))
 			fruit.model:PivotTo(CFrame.new(pos) * CFrame.fromAxisAngle(fruit.spinAxis, age * fruit.spinSpeed))
+			fruit.trailAnchor.CFrame = CFrame.new(pos)
 			local shine = fruit.shine
 			if shine then
 				local r = fruit.kind.Radius

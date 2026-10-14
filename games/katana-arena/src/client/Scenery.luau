@@ -25,6 +25,19 @@ type LightingSpec = {
 	Contrast: number,
 	Tint: Color3,
 	Stars: number,
+	SunRays: number?, -- intensity, nil = off
+	Clouds: number?, -- volumetric cloud cover 0..1, nil = off
+}
+
+-- Colours/materials for the server-built platforms, restyled locally per scene.
+type PlatformTheme = {
+	Plank: { Color3 },
+	PlankMaterial: Enum.Material,
+	Rock: Color3,
+	RockMaterial: Enum.Material,
+	Rail: Color3,
+	RailMaterial: Enum.Material,
+	Lantern: Color3,
 }
 
 local Scenery = {}
@@ -158,6 +171,146 @@ local function applyLighting(spec: LightingSpec)
 	local sky = ensure("Sky", "SceneSky") :: Sky
 	sky.CelestialBodiesShown = false -- every scene builds its own sun or moon
 	sky.StarCount = spec.Stars
+	local rays = ensure("SunRaysEffect", "SunRays") :: SunRaysEffect
+	rays.Enabled = spec.SunRays ~= nil
+	rays.Intensity = spec.SunRays or 0
+	rays.Spread = 0.7
+	-- The object field is ~27 studs from the camera: keep it sharp, soften the backdrop
+	-- so the objects pop out of busy scenes.
+	local focus = ensure("DepthOfFieldEffect", "Focus") :: DepthOfFieldEffect
+	focus.FocusDistance = 26
+	focus.InFocusRadius = 30
+	focus.FarIntensity = 0.22
+	focus.NearIntensity = 0
+	local clouds = workspace.Terrain:FindFirstChildOfClass("Clouds")
+	if not clouds then
+		clouds = Instance.new("Clouds")
+		clouds.Parent = workspace.Terrain
+	end
+	local cloudLayer = clouds :: Clouds
+	cloudLayer.Enabled = spec.Clouds ~= nil
+	cloudLayer.Cover = spec.Clouds or 0
+	cloudLayer.Density = 0.7
+	cloudLayer.Color = Color3.new(1, 1, 1)
+end
+
+---------------------------------------------------------------- terrain (local only)
+
+local terrain = workspace.Terrain
+
+local function water(color: Color3, transparency: number, waves: number)
+	terrain.WaterColor = color
+	terrain.WaterTransparency = transparency
+	terrain.WaterWaveSize = waves
+	terrain.WaterWaveSpeed = 10
+	terrain.WaterReflectance = 0.6
+end
+
+---------------------------------------------------------------- platform themes
+
+local themes: { [string]: PlatformTheme } = {
+	blutmond = {
+		Plank = { rgb(120, 72, 42), rgb(105, 62, 36) },
+		PlankMaterial = Enum.Material.WoodPlanks,
+		Rock = rgb(70, 62, 66),
+		RockMaterial = Enum.Material.Slate,
+		Rail = rgb(170, 25, 30),
+		RailMaterial = Enum.Material.Wood,
+		Lantern = rgb(255, 170, 80),
+	},
+	kirschbluete = {
+		Plank = { rgb(178, 135, 95), rgb(160, 120, 84) },
+		PlankMaterial = Enum.Material.WoodPlanks,
+		Rock = rgb(110, 125, 100),
+		RockMaterial = Enum.Material.Slate,
+		Rail = rgb(205, 40, 35),
+		RailMaterial = Enum.Material.Wood,
+		Lantern = rgb(255, 240, 215),
+	},
+	strand = {
+		Plank = { rgb(170, 130, 90), rgb(150, 112, 78) }, -- light planks glowed under the beach sun
+		PlankMaterial = Enum.Material.WoodPlanks,
+		Rock = rgb(185, 160, 118),
+		RockMaterial = Enum.Material.Sandstone,
+		Rail = rgb(245, 245, 240),
+		RailMaterial = Enum.Material.Wood,
+		Lantern = rgb(255, 150, 40),
+	},
+	skyline = {
+		Plank = { rgb(70, 72, 82), rgb(58, 60, 70) },
+		PlankMaterial = Enum.Material.DiamondPlate,
+		Rock = rgb(95, 95, 105),
+		RockMaterial = Enum.Material.Concrete,
+		Rail = rgb(40, 220, 255),
+		RailMaterial = Enum.Material.Neon,
+		Lantern = rgb(255, 60, 200),
+	},
+	unterwasser = {
+		Plank = { rgb(140, 115, 85), rgb(122, 100, 75) },
+		PlankMaterial = Enum.Material.WoodPlanks,
+		Rock = rgb(90, 125, 125),
+		RockMaterial = Enum.Material.Pebble,
+		Rail = rgb(60, 180, 170),
+		RailMaterial = Enum.Material.Wood,
+		Lantern = rgb(120, 255, 240),
+	},
+	weltraum = {
+		Plank = { rgb(185, 190, 200), rgb(160, 165, 178) },
+		PlankMaterial = Enum.Material.DiamondPlate,
+		Rock = rgb(55, 55, 66),
+		RockMaterial = Enum.Material.Basalt,
+		Rail = rgb(80, 150, 255),
+		RailMaterial = Enum.Material.Neon,
+		Lantern = rgb(130, 210, 255),
+	},
+}
+
+local function stylePart(part: Instance, theme: PlatformTheme)
+	if not part:IsA("BasePart") then
+		return
+	end
+	if part.Name == "Plank" then
+		-- alternate the two plank colours by the plank's position on the deck
+		local index = math.round(part.Position.X / 1.62)
+		part.Color = theme.Plank[index % #theme.Plank + 1]
+		part.Material = theme.PlankMaterial
+	elseif part.Name == "Rock" then
+		part.Color = theme.Rock
+		part.Material = theme.RockMaterial
+	elseif part.Name == "Post" or part.Name == "BackRail" then
+		part.Color = theme.Rail
+		part.Material = theme.RailMaterial
+	elseif part.Name == "Lantern" then
+		part.Color = theme.Lantern
+		local light = part:FindFirstChildOfClass("PointLight")
+		if light then
+			light.Color = theme.Lantern
+		end
+	end
+end
+
+-- Platforms stream in and out, so restyle new parts as they arrive.
+local function applyTheme(sceneId: string)
+	local theme = themes[sceneId] or themes.blutmond
+	local arena = workspace:FindFirstChild("Arena")
+	if not arena then
+		-- not replicated yet: try again once it arrives
+		task.spawn(function()
+			if workspace:WaitForChild("Arena", 15) and current == sceneId then
+				applyTheme(sceneId)
+			end
+		end)
+		return
+	end
+	for _, part in arena:GetDescendants() do
+		stylePart(part, theme)
+	end
+	table.insert(
+		connections,
+		arena.DescendantAdded:Connect(function(part)
+			stylePart(part, theme)
+		end)
+	)
 end
 
 ---------------------------------------------------------------- scenes
@@ -214,16 +367,20 @@ end
 scenes.kirschbluete = function(model)
 	local rng = Random.new(11)
 	local floor = -90
-	block(model, Vector3.new(3000, 2, 2200), rgb(120, 185, 95), at(0, floor - 1, -700), Enum.Material.Grass)
-	block(model, Vector3.new(520, 1, 240), rgb(110, 185, 225), at(40, floor + 0.2, -230)).Reflectance = 0.3
-	for _ = 1, 9 do
-		ball(
-			model,
-			rng:NextNumber(220, 420),
-			rgb(100, 160, 80),
-			at(rng:NextNumber(-800, 800), floor - 110, -rng:NextNumber(550, 950)),
+	-- terrain meadow with rolling hills and a real pond
+	water(rgb(70, 160, 190), 0.4, 0.05)
+	terrain:FillBlock(at(0, floor - 8, -650), Vector3.new(2000, 16, 1500), Enum.Material.Grass)
+	for _ = 1, 10 do
+		terrain:FillBall(
+			at(rng:NextNumber(-800, 800), floor - 120, -rng:NextNumber(600, 950)).Position,
+			rng:NextNumber(150, 220),
 			Enum.Material.Grass
 		)
+	end
+	terrain:FillBlock(at(40, floor - 4, -230), Vector3.new(520, 8, 240), Enum.Material.Water)
+	-- stepping stones and a stone lantern path towards the pond
+	for i = 0, 6 do
+		terrain:FillBall(at(-120 + i * 12, floor - 1, -150 - i * 8).Position, 4, Enum.Material.Slate)
 	end
 	for i = 0, 13 do
 		peak(
@@ -241,6 +398,11 @@ scenes.kirschbluete = function(model)
 		if math.abs(x - 40) > 280 or z < -380 or z > -120 then -- keep the pond free
 			cherryTree(model, rng, at(x, floor, z), rng:NextNumber(0.8, 1.3))
 		end
+	end
+	-- a closer row of big trees fills the empty meadow right below the platforms
+	for i = 0, 15 do
+		local x = -420 + i * 60 + rng:NextNumber(-15, 15)
+		cherryTree(model, rng, at(x, floor, -rng:NextNumber(150, 210)), rng:NextNumber(1.0, 1.3))
 	end
 	-- Pagoda: five shrinking tiers with wide roofs and a golden spire
 	local pagoda = at(-180, floor, -480)
@@ -296,6 +458,8 @@ scenes.kirschbluete = function(model)
 		Contrast = 0.08,
 		Tint = rgb(255, 245, 250),
 		Stars = 0,
+		SunRays = 0.1,
+		Clouds = 0.4,
 	})
 end
 
@@ -332,52 +496,76 @@ local function palm(model: Folder, rng: Random, base: CFrame)
 	end
 end
 
+local function umbrella(model: Folder, base: CFrame, color: Color3)
+	column(model, 9, 0.5, rgb(240, 240, 240), base * CFrame.new(0, 4.5, 0))
+	ellipsoid(model, Vector3.new(12, 2.5, 12), color, base * CFrame.new(0, 9, 0))
+	ellipsoid(model, Vector3.new(12.2, 1.2, 12.2), rgb(255, 255, 255), base * CFrame.new(0, 8.4, 0))
+	block(model, Vector3.new(4, 0.2, 7), color:Lerp(rgb(255, 255, 255), 0.4), base * CFrame.new(4, 0.1, 2))
+end
+
 scenes.strand = function(model)
 	local rng = Random.new(5)
 	local sea = -80
-	block(model, Vector3.new(4000, 2, 3200), rgb(30, 145, 205), at(0, sea - 1, -1300)).Reflectance = 0.15
-	ellipsoid(model, Vector3.new(950, 4, 440), rgb(70, 205, 220), at(80, sea + 0.2, -400)).Transparency = 0.15
-	ellipsoid(model, Vector3.new(720, 60, 300), rgb(240, 215, 160), at(80, sea - 22, -400), Enum.Material.Sand)
-	for _ = 1, 11 do
-		local x = rng:NextNumber(-220, 380)
-		local z = -400 + rng:NextNumber(-90, 90)
-		palm(model, rng, at(x, sea + 6, z))
+	water(rgb(25, 165, 200), 0.35, 0.35)
+	-- open sea (terrain water with waves and reflections)
+	terrain:FillBlock(at(0, sea - 12, -700), Vector3.new(2200, 24, 1600), Enum.Material.Water)
+	-- island: a shallow sandbank under water, a sandy beach and a grassy middle
+	for _, x in { -180, -60, 60, 180, 300 } do
+		terrain:FillCylinder(at(x, sea - 11, -400), 6, 175, Enum.Material.Sand)
 	end
-	for _ = 1, 5 do
-		local x = rng:NextNumber(-900, 900)
-		local z = -rng:NextNumber(700, 1000)
-		ellipsoid(
+	for _, x in { -170, -60, 60, 180, 290 } do
+		terrain:FillCylinder(at(x, sea - 6, -400), 14, 115, Enum.Material.Sand)
+	end
+	for _, x in { -40, 80, 200 } do
+		terrain:FillCylinder(at(x, sea - 2, -430), 8, 60, Enum.Material.Grass)
+	end
+	for _ = 1, 12 do
+		palm(model, rng, at(rng:NextNumber(-90, 260), sea + 1, -430 + rng:NextNumber(-50, 50)))
+	end
+	local umbrellaColors = { rgb(255, 80, 90), rgb(255, 200, 40), rgb(60, 170, 255), rgb(120, 220, 110) }
+	for i = 1, 7 do
+		umbrella(
 			model,
-			Vector3.new(rng:NextNumber(120, 260), 50, 90),
-			rgb(90, 160, 80),
-			at(x, sea - 10, z),
-			Enum.Material.Grass
+			at(-220 + i * 70 + rng:NextNumber(-15, 15), sea + 1, -315 + rng:NextNumber(-10, 10)),
+			umbrellaColors[i % #umbrellaColors + 1]
 		)
+	end
+	-- distant green islands with beaches; a lighthouse on the biggest one
+	for i = 1, 5 do
+		local x = -900 + i * 330 + rng:NextNumber(-60, 60)
+		local z = -rng:NextNumber(850, 1150)
+		local r = rng:NextNumber(60, 100)
+		terrain:FillCylinder(at(x, sea - 4, z), 8, r + 25, Enum.Material.Sand)
+		terrain:FillBall(at(x, sea - r * 0.55, z).Position, r, Enum.Material.Grass)
+		if i == 4 then
+			local tower = at(x, sea + r * 0.45, z)
+			for s = 0, 5 do
+				column(
+					model,
+					8,
+					9 - s * 0.6,
+					if s % 2 == 0 then rgb(240, 240, 240) else rgb(220, 40, 40),
+					tower * CFrame.new(0, 4 + s * 8, 0)
+				)
+			end
+			ball(model, 7, rgb(255, 240, 160), tower * CFrame.new(0, 52, 0), Enum.Material.Neon)
+		end
 	end
 	-- Sun with a soft halo
 	ball(model, 150, rgb(255, 245, 190), at(260, 170, -900), Enum.Material.Neon)
 	ball(model, 260, rgb(255, 235, 170), at(260, 170, -900), Enum.Material.Neon).Transparency = 0.85
-	for _ = 1, 12 do
-		local cloud = at(rng:NextNumber(-900, 900), rng:NextNumber(110, 230), -rng:NextNumber(450, 900))
-		for _ = 1, rng:NextInteger(4, 6) do
-			ball(
-				model,
-				rng:NextNumber(40, 85),
-				rgb(255, 255, 255),
-				cloud * CFrame.new(rng:NextNumber(-60, 60), rng:NextNumber(-10, 15), rng:NextNumber(-20, 20))
-			)
-		end
+	-- Sailboats
+	for i, pos in { Vector3.new(-260, 0, -560), Vector3.new(420, 0, -700) } do
+		local boat = at(pos.X, sea, pos.Z) * CFrame.Angles(0, i * 1.3, 0)
+		block(model, Vector3.new(14, 6, 40), rgb(250, 250, 250), boat * CFrame.new(0, 2, 0))
+		block(model, Vector3.new(15, 1.5, 41), rgb(30, 80, 160), boat * CFrame.new(0, 4.5, 0))
+		column(model, 40, 1.4, rgb(120, 90, 60), boat * CFrame.new(0, 25, 2), Enum.Material.Wood)
+		deco(model, {
+			Size = Vector3.new(0.5, 34, 22),
+			Color = if i == 1 then rgb(255, 250, 240) else rgb(255, 120, 90),
+			Material = Enum.Material.Fabric,
+		}, boat * CFrame.new(0, 25, -9) * CFrame.Angles(0, math.pi, 0), "WedgePart")
 	end
-	-- Sailboat
-	local boat = at(-260, sea, -560)
-	block(model, Vector3.new(14, 6, 40), rgb(250, 250, 250), boat * CFrame.new(0, 2, 0))
-	block(model, Vector3.new(15, 1.5, 41), rgb(30, 80, 160), boat * CFrame.new(0, 4.5, 0))
-	column(model, 40, 1.4, rgb(120, 90, 60), boat * CFrame.new(0, 25, 2), Enum.Material.Wood)
-	deco(model, {
-		Size = Vector3.new(0.5, 34, 22),
-		Color = rgb(255, 250, 240),
-		Material = Enum.Material.Fabric,
-	}, boat * CFrame.new(0, 25, -9) * CFrame.Angles(0, math.pi, 0), "WedgePart")
 	applyLighting({
 		ClockTime = 13.5,
 		Brightness = 3,
@@ -388,11 +576,13 @@ scenes.strand = function(model)
 		Glare = 0.4,
 		AtmosphereColor = rgb(200, 230, 255),
 		Decay = rgb(150, 190, 230),
-		Bloom = 0.5,
+		Bloom = 0.3,
 		Saturation = 0.2,
 		Contrast = 0.08,
 		Tint = rgb(255, 250, 240),
 		Stars = 0,
+		SunRays = 0.12,
+		Clouds = 0.55,
 	})
 end
 
@@ -465,16 +655,31 @@ end
 scenes.unterwasser = function(model)
 	local rng = Random.new(31)
 	local floor = -70
-	block(model, Vector3.new(4000, 2, 3000), rgb(210, 190, 140), at(0, floor - 1, -900), Enum.Material.Sand)
+	-- terrain sea floor with dunes and rocks
+	terrain:FillBlock(at(0, floor - 8, -600), Vector3.new(2000, 16, 1400), Enum.Material.Sand)
+	for _ = 1, 30 do
+		terrain:FillBall(
+			at(rng:NextNumber(-700, 700), floor - 30, -rng:NextNumber(80, 900)).Position,
+			rng:NextNumber(36, 70),
+			Enum.Material.Sand
+		)
+	end
+	for _ = 1, 18 do
+		terrain:FillBall(
+			at(rng:NextNumber(-500, 500), floor, -rng:NextNumber(70, 500)).Position,
+			rng:NextNumber(6, 16),
+			if rng:NextNumber() < 0.5 then Enum.Material.Rock else Enum.Material.Basalt
+		)
+	end
 	block(model, Vector3.new(4000, 1, 3000), rgb(70, 170, 220), at(0, 170, -600)).Transparency = 0.15
 	for _ = 1, 10 do
 		deco(
 			model,
 			{
-				Size = Vector3.new(14, 280, 1),
+				Size = Vector3.new(9, 280, 0.5),
 				Color = rgb(190, 245, 255),
 				Material = Enum.Material.Neon,
-				Transparency = 0.92,
+				Transparency = 0.96, -- soft god rays; at 0.92 they read as solid slabs
 			},
 			at(rng:NextNumber(-350, 350), 40, -rng:NextNumber(60, 320))
 				* CFrame.Angles(0, 0, math.rad(rng:NextNumber(-15, 15)))
@@ -719,12 +924,14 @@ function Scenery.Apply(sceneId: string)
 	if folder then
 		folder:Destroy()
 	end
+	terrain:Clear() -- local terrain only; the server has none
 	local newFolder = Instance.new("Folder")
 	newFolder.Name = "Scenery"
 	build(newFolder)
 	newFolder.Parent = workspace
 	folder = newFolder
 	current = sceneId
+	applyTheme(sceneId)
 end
 
 return Scenery

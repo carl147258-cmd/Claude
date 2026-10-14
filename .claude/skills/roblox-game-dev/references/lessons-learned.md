@@ -103,6 +103,10 @@ Entry format:
 ## Look & feel (VFX, lighting, first person)
 
 - **Far neon set pieces (moon, sun) vanish in Atmosphere haze beyond ~600 studs at Density 0.35.** The blood moon at 1100 studs was on screen but invisible; keep hero props closer than the fog distance and verify with `WorldToViewportPoint` plus a screenshot. (2026-10-14)
+- **Biggest cheap visual upgrades for part-built scenes: client-local Terrain (water with waves, sand/grass hills via `FillBlock`/`FillBall`/`FillCylinder`, cleared with `Terrain:Clear()` on scene change), the `Clouds` object, `SunRaysEffect`, a mild `DepthOfFieldEffect` focused on the play field, and `Highlight` outlines on gameplay objects.** Flat parts as water/clouds looked like a toy; terrain water + real clouds changed the beach completely. (2026-10-14)
+- **Bright materials (light wood, sand) under strong sun + Bloom glow white; keep deck colours mid-tone (≈ RGB 170/130/90) in day scenes.** (2026-10-14)
+- **A wide, light `Trail` on a flying object washes over the object itself (it looked translucent); keep trails narrow (≈0.2 r each side) and in the object's own colour.** (2026-10-14)
+- **`Lighting.Technology` cannot be read or set from the MCP/Assistant context (lacks RobloxScript capability); set it in Rojo (`Lighting.$properties.Technology`) and tell the user to set it once in Studio's Properties.** (2026-10-14)
 - **Third-person camera behind the avatar: add a local fill light between camera and avatar.** Night scenes lit only the avatar's front, so the player saw a black silhouette. (2026-10-14)
 
 - **A Roblox `Trail` on a fast first-person viewmodel turns into big flat quads** (the blade jumps 20–30° per frame). Draw the swoosh yourself: for every frame, sub-step the swing angle (≈3°) and spawn thin neon slabs along the outer blade that fade in ~0.15 s. (2026-10-13)
