@@ -1,0 +1,277 @@
+--!strict
+-- StarterPlayerScripts/Client/Shop (ModuleScript)
+-- Shop window: tabs for swords, object sets and scenes, a card per item with a 3D preview,
+-- price or equip button. It only sends intents ("Buy" / "Equip"); the server decides.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local Catalog = require(Shared:WaitForChild("Catalog"))
+local Config = require(Shared:WaitForChild("Config"))
+local ObjectBuilder = require(Shared:WaitForChild("ObjectBuilder"))
+local SwordBuilder = require(Shared:WaitForChild("SwordBuilder"))
+local Hud = require(script.Parent:WaitForChild("Hud"))
+
+type Card = { item: Catalog.Item, button: TextButton, frame: Frame }
+
+local PANEL_COLOR = Color3.fromRGB(25, 8, 18)
+local CARD_COLOR = Color3.fromRGB(45, 20, 35)
+local OWNED_COLOR = Color3.fromRGB(60, 120, 230)
+local EQUIPPED_COLOR = Color3.fromRGB(70, 70, 80)
+local BUY_COLOR = Color3.fromRGB(230, 160, 20)
+local POOR_COLOR = Color3.fromRGB(120, 80, 40)
+
+local Shop = {}
+
+local remote: RemoteEvent
+local panel: Frame
+local coinLabel: TextLabel
+local pages: { [string]: ScrollingFrame } = {}
+local tabs: { [string]: TextButton } = {}
+local cards: { [string]: { Card } } = {}
+local coins = 0
+local owned: { [string]: { [string]: boolean } } = {}
+local equipped: { [string]: string } = {}
+
+local function corner(parent: Instance, radius: number)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, radius)
+	c.Parent = parent
+end
+
+-- Frames a model in a ViewportFrame: the camera looks at the bounding box from the front.
+local function preview(parent: GuiObject, model: Model, angle: CFrame)
+	local viewport = Instance.new("ViewportFrame")
+	viewport.Size = UDim2.fromScale(1, 0.62)
+	viewport.BackgroundTransparency = 1
+	viewport.Ambient = Color3.fromRGB(170, 160, 170)
+	viewport.LightColor = Color3.fromRGB(255, 250, 245)
+	viewport.LightDirection = Vector3.new(-1, -1, -1)
+	model:PivotTo(angle)
+	model.Parent = viewport
+	local cf, size = model:GetBoundingBox()
+	local camera = Instance.new("Camera")
+	camera.FieldOfView = 30
+	-- fit height and width (preview area is about twice as wide as tall)
+	local tanHalf = math.tan(math.rad(camera.FieldOfView) / 2)
+	local distance = math.max(size.Y / (2 * tanHalf), size.X / (4 * tanHalf)) * 1.1 + size.Z / 2
+	camera.CFrame = CFrame.lookAt(cf.Position + Vector3.new(0, 0, distance), cf.Position)
+	camera.Parent = viewport
+	viewport.CurrentCamera = camera
+	viewport.Parent = parent
+end
+
+local function previewFor(category: string, item: Catalog.Item, parent: Frame)
+	if category == "Swords" and item.Style then
+		-- flat side to the camera, then tilted diagonally across the card
+		preview(
+			parent,
+			SwordBuilder.Build(item.Style),
+			CFrame.Angles(0, 0, math.rad(-55)) * CFrame.Angles(0, math.rad(90), 0)
+		)
+	elseif category == "Sets" and item.Kinds then
+		local group = Instance.new("Model")
+		local count = math.min(#item.Kinds, 3)
+		for i = 1, count do
+			local object = ObjectBuilder.Build(item.Kinds[i])
+			object:PivotTo(
+				CFrame.new((i - (count + 1) / 2) * 5.5, 0, 0) * CFrame.Angles(math.rad(10), math.rad(-15), 0)
+			)
+			object.Parent = group
+		end
+		preview(parent, group, CFrame.new())
+	else
+		local swatch = Instance.new("Frame")
+		swatch.Size = UDim2.new(1, -12, 0.62, -12)
+		swatch.Position = UDim2.fromOffset(6, 6)
+		swatch.BackgroundColor3 = Color3.new(1, 1, 1)
+		corner(swatch, 10)
+		local gradient = Instance.new("UIGradient")
+		local colors = item.Swatch or { Color3.new(1, 1, 1), Color3.new(0, 0, 0) }
+		gradient.Color = ColorSequence.new(colors[1], colors[2])
+		gradient.Rotation = 90
+		gradient.Parent = swatch
+		swatch.Parent = parent
+	end
+end
+
+local function refreshCard(category: string, card: Card)
+	local id = card.item.Id
+	local stroke = card.frame:FindFirstChildOfClass("UIStroke") :: UIStroke
+	if equipped[category] == id then
+		card.button.Text = "AUSGERÜSTET"
+		card.button.BackgroundColor3 = EQUIPPED_COLOR
+		stroke.Color = Config.CoinColor
+		stroke.Thickness = 3
+	elseif owned[category] and owned[category][id] then
+		card.button.Text = "AUSRÜSTEN"
+		card.button.BackgroundColor3 = OWNED_COLOR
+		stroke.Color = Color3.fromRGB(90, 60, 80)
+		stroke.Thickness = 1.5
+	else
+		card.button.Text = `{card.item.Price} Münzen`
+		card.button.BackgroundColor3 = if coins >= card.item.Price then BUY_COLOR else POOR_COLOR
+		stroke.Color = Color3.fromRGB(90, 60, 80)
+		stroke.Thickness = 1.5
+	end
+end
+
+local function refresh()
+	coinLabel.Text = `Münzen: {coins}`
+	for category, list in cards do
+		for _, card in list do
+			refreshCard(category, card)
+		end
+	end
+end
+
+local function makeCard(category: string, item: Catalog.Item, order: number, page: ScrollingFrame): Card
+	local frame = Instance.new("Frame")
+	frame.LayoutOrder = order
+	frame.BackgroundColor3 = CARD_COLOR
+	corner(frame, 12)
+	local stroke = Instance.new("UIStroke")
+	stroke.Parent = frame
+
+	previewFor(category, item, frame)
+
+	local name = Hud.Label({
+		Text = item.Name,
+		Position = UDim2.fromScale(0.05, 0.6),
+		Size = UDim2.fromScale(0.9, 0.14),
+	})
+	name.Parent = frame
+
+	local button = Hud.Button("", BUY_COLOR)
+	button.AnchorPoint = Vector2.new(0.5, 1)
+	button.Position = UDim2.fromScale(0.5, 0.96)
+	button.Size = UDim2.fromScale(0.86, 0.18)
+	button.Parent = frame
+	button.Activated:Connect(function()
+		if equipped[category] == item.Id then
+			return
+		end
+		if owned[category] and owned[category][item.Id] then
+			remote:FireServer("Equip", category, item.Id)
+		elseif coins < item.Price then
+			Hud.Toast(`Dir fehlen noch {item.Price - coins} Münzen`, Color3.fromRGB(255, 120, 120))
+		else
+			remote:FireServer("Buy", category, item.Id)
+		end
+	end)
+
+	frame.Parent = page
+	return { item = item, button = button, frame = frame }
+end
+
+local function showTab(category: string)
+	for name, page in pages do
+		page.Visible = name == category
+		tabs[name].BackgroundColor3 = if name == category then Config.GlowColor else CARD_COLOR
+	end
+end
+
+function Shop.Init(gameRemote: RemoteEvent)
+	remote = gameRemote
+	local gui = Hud.Gui()
+
+	panel = Instance.new("Frame")
+	panel.Name = "Shop"
+	panel.AnchorPoint = Vector2.new(0.5, 0.5)
+	panel.Position = UDim2.fromScale(0.5, 0.53)
+	panel.Size = UDim2.fromScale(0.92, 0.8)
+	panel.BackgroundColor3 = PANEL_COLOR
+	panel.BackgroundTransparency = 0.05
+	panel.Visible = false
+	panel.Active = true -- swallow clicks so the menu behind it does not react
+	panel.ZIndex = 10
+	corner(panel, 18)
+	local limit = Instance.new("UISizeConstraint")
+	limit.MaxSize = Vector2.new(960, 640)
+	limit.Parent = panel
+	local border = Instance.new("UIStroke")
+	border.Color = Config.CoinColor
+	border.Thickness = 3
+	border.Parent = panel
+
+	local title = Hud.Label({
+		Text = "SHOP",
+		Position = UDim2.new(0, 16, 0, 10),
+		Size = UDim2.new(0.3, 0, 0, 44),
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextColor3 = Config.CoinColor,
+	})
+	title.Parent = panel
+	coinLabel = Hud.Label({
+		Text = "Münzen: 0",
+		AnchorPoint = Vector2.new(0.5, 0),
+		Position = UDim2.new(0.5, 0, 0, 12),
+		Size = UDim2.new(0.3, 0, 0, 40),
+		TextColor3 = Config.CoinColor,
+	})
+	coinLabel.Parent = panel
+	local close = Hud.Button("X", Config.GlowColor) -- symbols like ✕ do not render in this font
+	close.AnchorPoint = Vector2.new(1, 0)
+	close.Position = UDim2.new(1, -12, 0, 10)
+	close.Size = UDim2.fromOffset(48, 44)
+	close.Parent = panel
+	close.Activated:Connect(Shop.Close)
+
+	for i, category in Catalog.Categories do
+		local tab = Hud.Button((Catalog.CategoryNames :: any)[category], CARD_COLOR)
+		tab.Position = UDim2.new((i - 1) / 3, if i == 1 then 16 else 6, 0, 64)
+		tab.Size = UDim2.new(1 / 3, -22, 0, 44)
+		tab.Parent = panel
+		tab.Activated:Connect(function()
+			showTab(category)
+		end)
+		tabs[category] = tab
+
+		local page = Instance.new("ScrollingFrame")
+		page.Position = UDim2.new(0, 16, 0, 120)
+		page.Size = UDim2.new(1, -32, 1, -134)
+		page.BackgroundTransparency = 1
+		page.BorderSizePixel = 0
+		page.ScrollBarThickness = 8
+		page.AutomaticCanvasSize = Enum.AutomaticSize.Y
+		page.CanvasSize = UDim2.new()
+		page.ScrollingDirection = Enum.ScrollingDirection.Y
+		page.Visible = false
+		local grid = Instance.new("UIGridLayout")
+		grid.CellSize = UDim2.new(1 / 3, -10, 0, 210)
+		grid.CellPadding = UDim2.fromOffset(10, 10)
+		grid.SortOrder = Enum.SortOrder.LayoutOrder
+		grid.Parent = page
+		page.Parent = panel
+		pages[category] = page
+
+		cards[category] = {}
+		for order, item in (Catalog :: any)[category] :: { Catalog.Item } do
+			table.insert(cards[category], makeCard(category, item, order, page))
+		end
+	end
+	showTab("Swords")
+	panel.Parent = gui
+	refresh()
+end
+
+function Shop.SetProfile(newCoins: number, newOwned: any, newEquipped: any)
+	coins = newCoins
+	owned = newOwned
+	equipped = newEquipped
+	refresh()
+end
+
+function Shop.Open()
+	panel.Visible = true
+end
+
+function Shop.Close()
+	panel.Visible = false
+end
+
+function Shop.IsOpen(): boolean
+	return panel.Visible
+end
+
+return Shop
