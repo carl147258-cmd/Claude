@@ -11,6 +11,20 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     Write-Host "   (ohne Git: fuer Updates setup-pc.ps1 erneut ausfuehren)"
 }
 
+# Start Roblox Studio if it is not running yet (Studio MCP needs an open place)
+if (-not (Get-Process RobloxStudioBeta -ErrorAction SilentlyContinue)) {
+    $studioExe = Get-ChildItem (Join-Path $env:LOCALAPPDATA "Roblox\Versions") -Recurse -Filter "RobloxStudioBeta.exe" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($studioExe) {
+        Start-Process $studioExe.FullName
+        Write-Host "== Roblox Studio wird gestartet - bitte ein Spiel/Baseplate oeffnen" -ForegroundColor Cyan
+    } else {
+        Write-Host "   Roblox Studio nicht gefunden - bitte manuell starten." -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "== Roblox Studio laeuft bereits" -ForegroundColor Cyan
+}
+
 # Keep the system awake (no admin needed). Undone automatically when this window closes.
 Add-Type -Namespace Win32 -Name Power -MemberDefinition @"
 [System.Runtime.InteropServices.DllImport("kernel32.dll")]
